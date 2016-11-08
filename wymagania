@@ -1,0 +1,22 @@
+ASN.1 -> Basic Encoding Rules
+RFC 1157 - opis PDU
+RFC 1155 - opis SMI
+RFC 1213 - opis MIB2
+
+
+Funkcjonalność:
+- obsługa MIB -> czytanie definicji MIBów
+- monitorowanie - odczytywanie prawdziwych wartości
+- nasłuchiwanie zapytań z sieci
+- formatowanie odpowiedzi zgodnie z BER
+
+Klasy:
+- MIBToolkit - obsługa MIB, czy obsługujemy dany OID, podstawia poprawne wartości pod PDU
+- SNMPServer - nasłuchuje na połączenia
+- SNMPPDU - dziedziczenie na poszczególne PDU, np. RequestPDU, RequestNEXT
+- SNMPDeserializer
+- SNMPSerializer - input: SNMPPDU, output: bytes
+
+- SNMPState
+- SNMPTrapMonitor
+
