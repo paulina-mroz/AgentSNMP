@@ -17,8 +17,8 @@ SNMPServer::~SNMPServer(){
 }
 
 void SNMPServer::initConnection(){
-
     socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0);
+
     if (socketDescriptor < 0){
         perror("Error while opening socket");
         error = -1;
@@ -48,9 +48,10 @@ void SNMPServer::receiveMessage(){
         bufLength = recvfrom(socketDescriptor, recvBuf, 1024, 0, (struct sockaddr*)&clientAddress, (socklen_t*)&(clilen));
         DEBUG("bufLength: %d\n", bufLength);
         for (int i = 0; i < bufLength; ++i) {
-            DEBUG("0x%02x %c",recvBuf[i],recvBuf[i]);
+            DEBUG("0x%02x %c ",recvBuf[i],recvBuf[i]);
         }
         printf("\n");
+        deserial1.getSerialData(recvBuf);
     }
     // clilen = sizeof(cli_addr);
 

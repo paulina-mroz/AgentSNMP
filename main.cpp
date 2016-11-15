@@ -2,27 +2,27 @@
 #include <unistd.h>
 #include <cstring>
 
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 #include "SNMPServer.h"
+#include "SNMPDeserializer.h"
 #include "defines.h"
 
-
-int main(void){
+int main(void) {
     DEBUG("Agent SNMP\n");
     SNMPServer serv1;
     serv1.initConnection();
     serv1.receiveMessage();
+
 
     // int sockfd, newsockfd, portno, clilen;
     // struct sockaddr_in serv_addr, cli_addr;
     // char buf_read[1024];
 
     // sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    // if (sockfd < 0){ 
+    // if (sockfd < 0){
     //     perror("ERROR opening socket\n");
     //     return 1;
     // }
@@ -56,7 +56,7 @@ int main(void){
     //     sendto(sockfd,send_data,strlen(send_data),0,(struct sockaddr *)&cli_addr,sizeof(struct sockaddr));
     //     fflush(stdout);
 
-        
+
     // }
 
     return 0;
