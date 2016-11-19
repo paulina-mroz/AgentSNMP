@@ -3,13 +3,12 @@
 
 #include "defines.h"
 
-class SNMPDeserializer
-{
+class SNMPDeserializer {
 public:
 	SNMPDeserializer();
 	~SNMPDeserializer();
 	void getSerialData(unsigned char data[]);
-	
+
 	int error;
 };
 

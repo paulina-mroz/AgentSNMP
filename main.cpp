@@ -8,13 +8,22 @@
 
 #include "SNMPServer.h"
 #include "SNMPDeserializer.h"
+#include "MIBParser.h"
 #include "defines.h"
 
 int main(void) {
     DEBUG("Agent SNMP\n");
-    SNMPServer serv1;
-    serv1.initConnection();
-    serv1.receiveMessage();
+    MIBParser parser1;
+    std::string fn = "mibs/RFC1213-MIB.txt";
+    //parser1.getFile(fn);
+    Tree tree1;
+    std::vector<int> checkID;
+    checkID.push_back(1);
+    DEBUG("Size: %d", tree1.node.at(checkID).child.size());
+    tree1.print();
+    // SNMPServer serv1;
+    // serv1.initConnection();
+    // serv1.receiveMessage();
 
 
     // int sockfd, newsockfd, portno, clilen;
