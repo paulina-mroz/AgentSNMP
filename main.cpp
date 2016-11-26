@@ -11,19 +11,23 @@
 #include "MIBParser.h"
 #include "defines.h"
 
-int main(void) {
+int main(int argc, char **argv) {
     DEBUG("Agent SNMP\n");
     MIBParser parser1;
     std::string fn = "mibs/RFC1213-MIB.txt";
-    //parser1.getFile(fn);
-    Tree tree1;
-    std::vector<int> checkID;
-    checkID.push_back(1);
-    DEBUG("Size: %d", tree1.node.at(checkID).child.size());
-    tree1.print();
+    parser1.parseFile(fn);
+    //Tree tree1;
+
+    if (argc > 1) {
+        if (!strcmp(argv[1], "print_tree")) {
+            parser1.tree.print();
+        }
+    }
     // SNMPServer serv1;
     // serv1.initConnection();
     // serv1.receiveMessage();
+
+
 
 
     // int sockfd, newsockfd, portno, clilen;

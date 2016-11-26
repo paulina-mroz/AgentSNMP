@@ -3,7 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-//#include <boost/algorithm/string.hpp>
+#include <regex>
+#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 
 #include "MIBParser.h"
@@ -11,29 +12,162 @@
 #include "defines.h"
 
 MIBParser::MIBParser() {
-    DEBUG("Constructor\n");
+    DEBUG("Constructor");
+    // state = IDLE;
+    // buffer.clear();
+
+    // std::vector<int> newID;
+    // newID.push_back(1);
+    // std::vector<int> children;
+    // children.push_back(3);
+    // root = newID;
 }
 
 MIBParser::~MIBParser() {
-    DEBUG("Deconstructor\n");
+    DEBUG("Deconstructor");
 }
 
-void MIBParser::getFile(std::string fileName) {
+void MIBParser::getFile(std::string fileName, std::string &content) {
     DEBUG("Read file");
     std::ifstream myfile(fileName);
     std::string line;
+    content.clear();
     if(myfile.is_open()) {
-        while ( std::getline (myfile,line) ) {
+        while (std::getline(myfile,line)) {
             removeComments(line);
-            std::cout << line << '\n';
+            content += line + "\n";
         }
         myfile.close();
     }
-
 }
 
 void MIBParser::removeComments(std::string &line) {
     std::vector<std::string> v;
     boost::split_regex(v, line, boost::regex( "--" ));
     line = v.at(0);
+}
+
+void MIBParser::addNode(std::string &parent, std::string &name, int number) {
+    if (parent.empty()) return;
+    DEBUG("NODE %d",tree.findNode(name));
+    if (tree.findNode(name) >= 0) return;
+
+    int ind = tree.findNode(parent);
+    std::vector<int> vid;
+    vid.clear();
+    vid.push_back(1);
+    if (ind < 0) {
+
+        tree.node.push_back(Node());
+    //     tree.node.back().child = children;
+        tree.node.back().name = parent;
+        tree.node.back().oid = vid;
+        tree.root = vid;
+    }
+    tree.node.push_back(Node());
+    tree.node.back().name = name;
+    tree.node.back().oid = tree.node.at(tree.findNode(parent)).oid;
+    tree.node.back().oid.push_back(number);
+
+    tree.node.at(tree.findNode(parent)).child.push_back(number);
+    std::sort(tree.node.at(tree.findNode(parent)).child.begin(), tree.node.at(tree.findNode(parent)).child.end());
+}
+
+void MIBParser::parseFile(std::string fileName) {
+    std::string content;
+    getFile(fileName, content);
+    //handleImports(content);
+    //handleObjectID(content);
+    handleObjectType(content);
+}
+
+void MIBParser::handleImports(const std::string &block) {
+    std::regex rgx("IMPORTS[\\s]*([^;])*");
+    std::smatch match;
+
+    if (std::regex_search(block.begin(), block.end(), match, rgx)) {
+         for (unsigned i=0; i<match.size(); ++i)
+             std::cout << "match #" << i << ": " << match[i] << std::endl;
+    }
+
+}
+
+void MIBParser::handleObjectID(const std::string &block) {
+    std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT IDENTIFIER[\\s]+::=[\\s]+\\{(([^\\}])*)\\}");
+    std::smatch match;
+
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
+        match = *i;
+        std::string blockNodes = match.str(2);
+        std::string name = match.str(1);
+
+        handleParentFromBraces(name,blockNodes);
+    }
+}
+
+void MIBParser::handleObjectType(const std::string &block) {
+    //std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT-TYPE([^:]+)::=[\\s]+\\{(([^\\}])*)\\}");
+    std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT-TYPE[\\s]+SYNTAX[\\s]+([^\\n]+)[\\s]+ACCESS[\\s]+([^\\n]+)[\\s]+STATUS[\\s]+([^\\n]+)[\\s]+DESCRIPTION[\\s]+\"([^\"]+)\"[\\s]+::=[\\s]+\\{([^\\}]*)\\}");
+    std::smatch match;
+
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
+        match = *i;
+        //std::cout << m.str() << " at position " << m.position() << '\n';
+        for (unsigned i=0; i<match.size(); ++i)
+            std::cout << "+++++++ match #" << i << ": " << match[i] << std::endl;
+
+        std::string blockNodes = match.str(3);
+        std::string name = match.str(1);
+
+        //handleParentFromBraces(name,blockNodes);
+
+    }
+}
+
+void MIBParser::handleParentFromBraces(std::string &child, std::string &blockParent) {
+    boost::trim(blockParent);
+
+    std::string nameChild;
+    std::string nameParent;
+    int number;
+    std::vector<std::string> nameParents;
+
+    boost::split_regex(nameParents, blockParent, boost::regex( "[\\s]+" ));
+    int aaa = 0;
+    for (std::vector<std::string>::iterator it=nameParents.begin(); it<nameParents.end(); ++it) {
+        std::cout << *it << "===" << aaa++ << "---";
+    }
+
+    if (nameParents.size() >= 2) {
+        std::vector<std::string>::iterator it;
+
+        for (it=nameParents.begin(); it<nameParents.end()-1; ++it) {
+            std::cout << "|||||" << *it << "||||||";
+            const std::string blockIt = *it;
+            std::regex rgxIt("([\\w-]+)\\(*([\\d]*)\\)*");
+            std::smatch matchIt;
+
+            if (std::regex_search(blockIt.begin(), blockIt.end(), matchIt, rgxIt)) {
+                 for (unsigned i=0; i<matchIt.size(); ++i)
+                     std::cout << "match2 #" << i << ": " << matchIt[i] << std::endl;
+            }
+
+            nameChild = matchIt.str(1);
+            if (matchIt.str(2).empty()) {
+                number = 1;
+            } else {
+                number = std::stoi(matchIt.str(2));
+            }
+
+            if (!nameParent.empty()) {
+                addNode(nameParent, nameChild, number);
+                std::cout << "Parent: " << nameParent << ", child: " << nameChild << ", nr: " << number << std::endl;
+            }
+
+            nameParent = nameChild;
+        }
+        number = std::stoi(*it);
+        nameChild = child;
+        addNode(nameParent, nameChild, number);
+    }
 }
