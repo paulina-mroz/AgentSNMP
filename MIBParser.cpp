@@ -76,28 +76,47 @@ void MIBParser::addNode(std::string &parent, std::string &name, int number) {
 void MIBParser::parseFile(std::string fileName) {
     std::string content;
     getFile(fileName, content);
-    //handleImports(content);
-    //handleObjectID(content);
+    handleImports(content);
+    handleObjectID(content);
     handleObjectType(content);
 }
 
 void MIBParser::handleImports(const std::string &block) {
-    std::regex rgx("IMPORTS[\\s]*([^;])*");
+    std::regex rgx("IMPORTS[\\s]*[^;]*");
     std::smatch match;
 
     if (std::regex_search(block.begin(), block.end(), match, rgx)) {
-         for (unsigned i=0; i<match.size(); ++i)
-             std::cout << "match #" << i << ": " << match[i] << std::endl;
+        std::regex rgx2("FROM[\\s]+([\\w-_]+)");
+        std::smatch match2;
+        const std::string blockImport = match.str(0);
+
+        for(std::sregex_iterator i = std::sregex_iterator(blockImport.begin(), blockImport.end(), rgx2); i != std::sregex_iterator(); ++i ) {
+            match2 = *i;
+            // for (unsigned i=0; i<match2.size(); ++i)
+            //     std::cout << "match #" << i << ": " << match2[i] << std::endl;
+            std::string name = match2.str(1);
+            if (name != "RFC-1212") {
+                std::string fileName = "mibs/" + name + ".txt";
+                std::string contentImport;
+                getFile(fileName, contentImport);
+                //std::cout << contentImport;
+                handleObjectID(contentImport);
+            }
+        }
+
     }
 
 }
 
 void MIBParser::handleObjectID(const std::string &block) {
-    std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT IDENTIFIER[\\s]+::=[\\s]+\\{(([^\\}])*)\\}");
+    DEBUG("");
+    std::regex rgx("[\\s]*([\\w-]+)[\\s]+OBJECT IDENTIFIER[\\s]+::=[\\s]+\\{(([^\\}])*)\\}");
     std::smatch match;
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
         match = *i;
+        // for (unsigned i=0; i<match.size(); ++i)
+        //     std::cout << "match #" << i << ": " << match[i] << std::endl;
         std::string blockNodes = match.str(2);
         std::string name = match.str(1);
 
@@ -107,7 +126,7 @@ void MIBParser::handleObjectID(const std::string &block) {
 
 void MIBParser::handleObjectType(const std::string &block) {
     //std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT-TYPE([^:]+)::=[\\s]+\\{(([^\\}])*)\\}");
-    std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT-TYPE[\\s]+SYNTAX[\\s]+([^\\n]+)[\\s]+ACCESS[\\s]+([^\\n]+)[\\s]+STATUS[\\s]+([^\\n]+)[\\s]+DESCRIPTION[\\s]+\"([^\"]+)\"[\\s]+::=[\\s]+\\{([^\\}]*)\\}");
+    std::regex rgx("[\\s]*([\\w-]+)[\\s]+OBJECT-TYPE[\\s]+SYNTAX[\\s]+([^\\n]+)[\\s]+ACCESS[\\s]+([^\\n]+)[\\s]+STATUS[\\s]+([^\\n]+)[\\s]+DESCRIPTION[\\s]+\"([^\"]+)\"[\\s]+::=[\\s]+\\{([^\\}]*)\\}");
     std::smatch match;
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
@@ -116,10 +135,10 @@ void MIBParser::handleObjectType(const std::string &block) {
         for (unsigned i=0; i<match.size(); ++i)
             std::cout << "+++++++ match #" << i << ": " << match[i] << std::endl;
 
-        std::string blockNodes = match.str(3);
+        std::string blockNodes = match.str(6);
         std::string name = match.str(1);
 
-        //handleParentFromBraces(name,blockNodes);
+        handleParentFromBraces(name,blockNodes);
 
     }
 }
@@ -133,38 +152,38 @@ void MIBParser::handleParentFromBraces(std::string &child, std::string &blockPar
     std::vector<std::string> nameParents;
 
     boost::split_regex(nameParents, blockParent, boost::regex( "[\\s]+" ));
-    int aaa = 0;
-    for (std::vector<std::string>::iterator it=nameParents.begin(); it<nameParents.end(); ++it) {
-        std::cout << *it << "===" << aaa++ << "---";
-    }
+    // int aaa = 0;
+    // for (std::vector<std::string>::iterator it=nameParents.begin(); it<nameParents.end(); ++it) {
+    //     std::cout << *it << "===" << aaa++ << "---";
+    // }
 
     if (nameParents.size() >= 2) {
         std::vector<std::string>::iterator it;
 
         for (it=nameParents.begin(); it<nameParents.end()-1; ++it) {
-            std::cout << "|||||" << *it << "||||||";
+            // std::cout << "|||||" << *it << "||||||";
             const std::string blockIt = *it;
             std::regex rgxIt("([\\w-]+)\\(*([\\d]*)\\)*");
             std::smatch matchIt;
 
             if (std::regex_search(blockIt.begin(), blockIt.end(), matchIt, rgxIt)) {
-                 for (unsigned i=0; i<matchIt.size(); ++i)
-                     std::cout << "match2 #" << i << ": " << matchIt[i] << std::endl;
-            }
+                //  for (unsigned i=0; i<matchIt.size(); ++i)
+                //      std::cout << "match2 #" << i << ": " << matchIt[i] << std::endl;
 
-            nameChild = matchIt.str(1);
-            if (matchIt.str(2).empty()) {
-                number = 1;
-            } else {
-                number = std::stoi(matchIt.str(2));
-            }
+                nameChild = matchIt.str(1);
+                if (matchIt.str(2).empty()) {
+                    number = 1;
+                } else {
+                    number = std::stoi(matchIt.str(2));
+                }
 
-            if (!nameParent.empty()) {
-                addNode(nameParent, nameChild, number);
-                std::cout << "Parent: " << nameParent << ", child: " << nameChild << ", nr: " << number << std::endl;
-            }
+                if (!nameParent.empty()) {
+                    addNode(nameParent, nameChild, number);
+                    // std::cout << "Parent: " << nameParent << ", child: " << nameChild << ", nr: " << number << std::endl;
+                }
 
-            nameParent = nameChild;
+                nameParent = nameChild;
+            }
         }
         number = std::stoi(*it);
         nameChild = child;

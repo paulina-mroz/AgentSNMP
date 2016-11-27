@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     //Tree tree1;
 
     if (argc > 1) {
-        if (!strcmp(argv[1], "print_tree")) {
+        if ((!strcmp(argv[1], "--print_tree")) || (!strcmp(argv[1], "-p"))) {
             parser1.tree.print();
         }
     }
