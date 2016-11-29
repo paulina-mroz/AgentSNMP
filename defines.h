@@ -2,7 +2,7 @@
 #define DEFINES_H
 
 
-#define SHOW_DEBUG 0
+#define SHOW_DEBUG 1
 #if SHOW_DEBUG
 #define DEBUG(...) printf("%s(%d):\t%s: ", __FILE__, __LINE__, __FUNCTION__); printf(__VA_ARGS__); printf("\n");
 #define DEBUG1     printf
