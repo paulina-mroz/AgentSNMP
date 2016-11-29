@@ -16,11 +16,20 @@ int main(int argc, char **argv) {
     MIBParser parser1;
     std::string fn = "mibs/RFC1213-MIB.txt";
     parser1.parseFile(fn);
-    //Tree tree1;
 
-    if (argc > 1) {
-        if ((!strcmp(argv[1], "--print_tree")) || (!strcmp(argv[1], "-p"))) {
-            parser1.tree.print();
+    for (int i=0; i<argc; ++i) {
+        printf("%d: %s, ",i,argv[i]);
+    }
+    printf("\n");
+
+    if (argc == 2) {
+        if ((!strcmp(argv[1], "--print_tree")) || (!strcmp(argv[1], "-t"))) {
+            parser1.tree.print_tree();
+        }
+    } else if (argc == 3) {
+        if ((!strcmp(argv[1], "--print_node")) || (!strcmp(argv[1], "-n"))) {
+            std::string name(argv[2]);
+            parser1.tree.print_node(name);
         }
     }
     // SNMPServer serv1;

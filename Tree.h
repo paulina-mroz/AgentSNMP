@@ -16,6 +16,12 @@ public:
     std::vector<int> oid;
     std::vector<int> child;
     std::string name;
+
+    std::string syntax;
+    std::string access;
+    std::string status;
+    std::string description;
+    std::vector<std::string> index;
 };
 
 class Tree {
@@ -24,7 +30,8 @@ public:
     ~Tree();
     int findNode(std::string const& ref);
     int findNode(std::vector<int> const& ref);
-    void print();
+    void print_tree();
+    void print_node(std::string name);
     void print_vector(std::vector<int> v);
 
 

@@ -98,7 +98,7 @@ int Tree::findNode(std::vector<int> const& ref) {
     return -1;
 }
 
-void Tree::print() {
+void Tree::print_tree() {
     std::list<std::vector<int>> remainID;
     remainID.push_front(root);
 
@@ -144,6 +144,21 @@ void Tree::print() {
             level.at(sizeID-1)--;
         }
     }
+}
+
+void Tree::print_node(std::string name) {
+    std::cout << "INFO about: " << name << std::endl;
+    if (findNode(name) < 0) return;
+    Node tmpNode  = node.at(findNode(name));
+    if (!tmpNode.syntax.empty())
+        std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
+    if (!tmpNode.access.empty())
+        std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
+    if (!tmpNode.status.empty())
+        std::cout << "STATUS\n\t" << tmpNode.status << std::endl;
+    if (!tmpNode.description.empty())
+        std::cout << "DESCRIPTION\n\t" << tmpNode.description << std::endl;
+
 }
 
 void Tree::print_vector(std::vector<int> v) {

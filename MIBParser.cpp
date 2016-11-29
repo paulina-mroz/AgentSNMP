@@ -126,7 +126,16 @@ void MIBParser::handleObjectID(const std::string &block) {
 
 void MIBParser::handleObjectType(const std::string &block) {
     //std::regex rgx("\\n([\\w-]+)[\\s]+OBJECT-TYPE([^:]+)::=[\\s]+\\{(([^\\}])*)\\}");
-    std::regex rgx("[\\s]*([\\w-]+)[\\s]+OBJECT-TYPE[\\s]+SYNTAX[\\s]+([^\\n]+)[\\s]+ACCESS[\\s]+([^\\n]+)[\\s]+STATUS[\\s]+([^\\n]+)[\\s]+DESCRIPTION[\\s]+\"([^\"]+)\"[\\s]+::=[\\s]+\\{([^\\}]*)\\}");
+    std::string rgxStrOT = "[\\s]*([\\w-]+)[\\s]+OBJECT-TYPE[\\s]+";
+    std::string rgxStrSyntax = "SYNTAX[\\s]+([^\\n]+)[\\s]+";
+    std::string rgxStrSyntax2 = "SYNTAX[\\s]+([\\w]+[\\s]+\\{[^\\}]+\\})[\\s]+";
+    std::string rgxStrSyntax3 = "SYNTAX(?:[\\s]+([^\\n]+)[\\s]+|[\\s]+([\\w]+[\\s]+\\{[^\\}]+\\})[\\s]+)";
+    std::string rgxStrAccess = "ACCESS[\\s]+([^\\n]+)[\\s]+STATUS[\\s]+([^\\n]+)[\\s]+DESCRIPTION[\\s]+\"([^\"]+)\"[\\s]+";
+    std::string rgxStrIndex = "INDEX[\\s]+(\\{[^\\}]+\\})[\\s]+";
+    std::string rgxStrIndex2 = "(?:INDEX[\\s]+(\\{[^\\}]+\\})[\\s]+)*";
+    std::string rgxStrParent = "::=[\\s]+\\{([^\\}]*)\\}";
+    std::string rgxStr = rgxStrOT + rgxStrSyntax + rgxStrAccess + rgxStrIndex2 + rgxStrParent;
+    std::regex rgx(rgxStr);
     std::smatch match;
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
@@ -135,12 +144,31 @@ void MIBParser::handleObjectType(const std::string &block) {
         for (unsigned i=0; i<match.size(); ++i)
             std::cout << "+++++++ match #" << i << ": " << match[i] << std::endl;
 
-        std::string blockNodes = match.str(6);
+        std::string blockNodes = match.str(7);
         std::string name = match.str(1);
 
         handleParentFromBraces(name,blockNodes);
+        tree.node.at(tree.findNode(name)).syntax = match.str(2);
+        tree.node.at(tree.findNode(name)).access = match.str(3);
+        tree.node.at(tree.findNode(name)).status = match.str(4);
+        tree.node.at(tree.findNode(name)).description = match.str(5);
 
     }
+
+    // rgxStr = rgxStrOT + rgxStrSyntax2 + rgxStrAccess + rgxStrParent;
+    // std::regex rgx2(rgxStr);
+    // for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx2); i != std::sregex_iterator(); ++i ) {
+    //     match = *i;
+    //     //std::cout << m.str() << " at position " << m.position() << '\n';
+    //     for (unsigned i=0; i<match.size(); ++i)
+    //         std::cout << "======= match #" << i << ": " << match[i] << std::endl;
+    //
+    //     std::string blockNodes = match.str(6);
+    //     std::string name = match.str(1);
+    //
+    //     handleParentFromBraces(name,blockNodes);
+    //
+    // }
 }
 
 void MIBParser::handleParentFromBraces(std::string &child, std::string &blockParent) {
