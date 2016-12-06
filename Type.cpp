@@ -9,6 +9,7 @@
 
 Type::Type() {
     DEBUG("Constructor");
+    size = -1;
 }
 
 Type::~Type() {

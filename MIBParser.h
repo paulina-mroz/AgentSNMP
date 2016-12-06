@@ -2,7 +2,9 @@
 #define MIBPARSER_H
 
 #include <string>
+#include <map>
 #include "Tree.h"
+#include "Type.h"
 #include "defines.h"
 
 // enum enumState {
@@ -22,8 +24,13 @@ public:
     void handleObjectID(const std::string &block);
     void handleObjectType(const std::string &block);
     void handleParentFromBraces(std::string &child, std::string &blockParent);
+    void handleTypeImplicit(const std::string &block);
+
+    void addPrimaryType(const std::string block, Type &type);
+    void initPrimaryTypes();
 
     Tree tree;
+    std::map<std::string, Type> typeMap;
 
     //enumState state;
     //std::string buffer;

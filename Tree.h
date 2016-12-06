@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include "defines.h"
+#include "Type.h"
 
 class Node {
 public:
@@ -17,11 +18,13 @@ public:
     std::vector<int> child;
     std::string name;
 
-    std::string syntax;
+    // std::string syntax;
+    Type syntax;
     std::string access;
     std::string status;
     std::string description;
     std::vector<std::string> index;
+    std::map<std::vector<int>, std::string> value;
 };
 
 class Tree {

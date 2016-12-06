@@ -150,8 +150,8 @@ void Tree::print_node(std::string name) {
     std::cout << "INFO about: " << name << std::endl;
     if (findNode(name) < 0) return;
     Node tmpNode  = node.at(findNode(name));
-    if (!tmpNode.syntax.empty())
-        std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
+    // if (!tmpNode.syntax.empty())
+    //     std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
     if (!tmpNode.access.empty())
         std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
     if (!tmpNode.status.empty())

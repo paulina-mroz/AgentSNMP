@@ -13,6 +13,7 @@
 
 MIBParser::MIBParser() {
     DEBUG("Constructor");
+    initPrimaryTypes();
     // state = IDLE;
     // buffer.clear();
 
@@ -25,6 +26,17 @@ MIBParser::MIBParser() {
 
 MIBParser::~MIBParser() {
     DEBUG("Deconstructor");
+}
+
+void MIBParser::initPrimaryTypes() {
+    typeMap["INTEGER"] = Type();
+    typeMap.at("INTEGER").size = 9;
+
+    typeMap["OCTET STRING"] = Type();
+    typeMap["OBJECT IDENTIFIER"] = Type();
+    typeMap["SEQUENCE"] = Type();
+
+    // std::cout << "primary: " << typeMap.at("INTEGER").primaryType << ", size: " << typeMap.at("INTEGER").size << std::endl;
 }
 
 void MIBParser::getFile(std::string fileName, std::string &content) {
@@ -101,6 +113,7 @@ void MIBParser::handleImports(const std::string &block) {
                 getFile(fileName, contentImport);
                 //std::cout << contentImport;
                 handleObjectID(contentImport);
+                handleTypeImplicit(contentImport);
             }
         }
 
@@ -109,7 +122,6 @@ void MIBParser::handleImports(const std::string &block) {
 }
 
 void MIBParser::handleObjectID(const std::string &block) {
-    DEBUG("");
     std::regex rgx("[\\s]*([\\w-]+)[\\s]+OBJECT IDENTIFIER[\\s]+::=[\\s]+\\{(([^\\}])*)\\}");
     std::smatch match;
 
@@ -149,11 +161,11 @@ void MIBParser::handleObjectType(const std::string &block) {
         std::string name = match.str(1);
 
         handleParentFromBraces(name,blockNodes);
-        if (!match.str(2).empty()) {
-            tree.node.at(tree.findNode(name)).syntax = match.str(2);
-        } else {
-            tree.node.at(tree.findNode(name)).syntax = match.str(3);
-        }
+        // if (!match.str(2).empty()) {
+        //     tree.node.at(tree.findNode(name)).syntax = match.str(2);
+        // } else {
+        //     tree.node.at(tree.findNode(name)).syntax = match.str(3);
+        // }
         tree.node.at(tree.findNode(name)).access = match.str(4);
         tree.node.at(tree.findNode(name)).status = match.str(5);
         tree.node.at(tree.findNode(name)).description = match.str(6);
@@ -207,5 +219,51 @@ void MIBParser::handleParentFromBraces(std::string &child, std::string &blockPar
         number = std::stoi(*it);
         nameChild = child;
         addNode(nameParent, nameChild, number);
+    }
+}
+
+void MIBParser::handleTypeImplicit(const std::string &block) {
+    std::regex rgx("[\\s]*([\\w-]+)[\\s]+::=[\\s]+\\[[^\\]]+\\][\\s]+IMPLICIT[\\s]+([^\\n]+)");
+    std::smatch match;
+
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
+        match = *i;
+        for (unsigned i=0; i<match.size(); ++i)
+            std::cout << "match #" << i << ": " << match[i] << std::endl;
+        std::string name = match.str(1);
+        const std::string blockType = match.str(2);
+        typeMap[name] = Type();
+        // typeMap[name].primaryType = "A";
+        // std::cout << "AAA: " << typeMap[name].primaryType << std::endl;
+        addPrimaryType(blockType, typeMap.at(name));
+        std::cout << "TYPE:" << typeMap.at(name).primaryType << ":" << std::endl;
+
+        //
+        // handleParentFromBraces(name,blockNodes);
+    }
+}
+
+void MIBParser::addPrimaryType(const std::string block, Type &type) {
+    std::regex rgx("([\\s\\S]+)\\(([\\d]+)..([\\d]+)\\)|([\\s\\S]+)\\(SIZE \\(([\\d]+)\\)\\)");
+    std::smatch match;
+
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
+        match = *i;
+        for (unsigned i=0; i<match.size(); ++i)
+            std::cout << "***match #" << i << ": ---" << match[i] << "---" << std::endl;
+
+        // type.size = std::stoi(match.str(2));
+        // std::string typeStr = match.str(1);
+        // boost::trim(typeStr);
+        // type.primaryType = typeStr;
+    }
+
+    std::regex rgx2("([\\s\\S]+)\\(([\\d]+)..([\\d]+)\\)");
+    std::smatch match2;
+
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx2); i != std::sregex_iterator(); ++i ) {
+        match2 = *i;
+        for (unsigned i=0; i<match2.size(); ++i)
+            std::cout << "+++match #" << i << ": ---" << match2[i] << "---" << std::endl;
     }
 }
