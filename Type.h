@@ -10,15 +10,16 @@ class Type {
 public:
     Type();
     ~Type();
+    void print_info();
 
     std::string primaryType;
-    int size;
+    std::vector<int> size;
     std::vector<int> range;
     std::map<int, std::string> enumInt;
-    // std::map<std::string, Type> table;
+    std::map<std::string, Type> table;
 };
 
-// std::vector<Type> types;
+
 
 
 #endif /* TYPE_H */

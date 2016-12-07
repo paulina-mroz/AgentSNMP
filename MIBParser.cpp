@@ -30,13 +30,17 @@ MIBParser::~MIBParser() {
 
 void MIBParser::initPrimaryTypes() {
     typeMap["INTEGER"] = Type();
-    typeMap.at("INTEGER").size = 9;
+    // typeMap.at("INTEGER").size = 9;
 
     typeMap["OCTET STRING"] = Type();
     typeMap["OBJECT IDENTIFIER"] = Type();
     typeMap["SEQUENCE"] = Type();
 
-    // std::cout << "primary: " << typeMap.at("INTEGER").primaryType << ", size: " << typeMap.at("INTEGER").size << std::endl;
+    // for (auto &p : typeMap) {
+    //     std::cout << "INFO " << p.first << std::endl;
+    //     p.second.print_info();
+    // }
+
 }
 
 void MIBParser::getFile(std::string fileName, std::string &content) {
@@ -161,11 +165,13 @@ void MIBParser::handleObjectType(const std::string &block) {
         std::string name = match.str(1);
 
         handleParentFromBraces(name,blockNodes);
-        // if (!match.str(2).empty()) {
-        //     tree.node.at(tree.findNode(name)).syntax = match.str(2);
-        // } else {
-        //     tree.node.at(tree.findNode(name)).syntax = match.str(3);
-        // }
+        std::string blockSyntax;
+        if (!match.str(2).empty()) {
+            blockSyntax = match.str(2);
+        } else {
+            blockSyntax = match.str(3);
+        }
+        addPrimaryType(blockSyntax, tree.node.at(tree.findNode(name)).syntax);
         tree.node.at(tree.findNode(name)).access = match.str(4);
         tree.node.at(tree.findNode(name)).status = match.str(5);
         tree.node.at(tree.findNode(name)).description = match.str(6);
@@ -228,8 +234,8 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        for (unsigned i=0; i<match.size(); ++i)
-            std::cout << "match #" << i << ": " << match[i] << std::endl;
+        // for (unsigned i=0; i<match.size(); ++i)
+        //     std::cout << "match #" << i << ": " << match[i] << std::endl;
         std::string name = match.str(1);
         const std::string blockType = match.str(2);
         typeMap[name] = Type();
@@ -244,13 +250,25 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
 }
 
 void MIBParser::addPrimaryType(const std::string block, Type &type) {
-    std::regex rgx("([\\s\\S]+)\\(([\\d]+)..([\\d]+)\\)|([\\s\\S]+)\\(SIZE \\(([\\d]+)\\)\\)");
+    std::cout << "!!! " << block << std::endl;
+
+    std::string rgxStrPartPrim = "[ ]*([\\w]+[ ]*[\\w]*)[ ]*";
+    std::string rgxStrPrim = "^" + rgxStrPartPrim + "$";
+
+    std::string rgxStrPartRange = "\\(([\\d]+)\\.\\.([\\d]+)\\)";
+    std::string rgxStrRange = "^" + rgxStrPartPrim + rgxStrPartRange;
+
+    // std::string rgxStrPartSize = "\\(SIZE \\(([\\d]+)[.]{0,2}\\)\\)";
+
+
+    std::regex rgxPrim(rgxStrPrim);
+    // std::regex rgx("([\\s\\S]+)\\(([\\d]+)..([\\d]+)\\)|([\\s\\S]+)\\(SIZE \\(([\\d]+)\\)\\)");
     std::smatch match;
 
-    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgxPrim); i != std::sregex_iterator(); ++i ) {
         match = *i;
         for (unsigned i=0; i<match.size(); ++i)
-            std::cout << "***match #" << i << ": ---" << match[i] << "---" << std::endl;
+            std::cout << "Prim match #" << i << ": ---" << match[i] << "---" << std::endl;
 
         // type.size = std::stoi(match.str(2));
         // std::string typeStr = match.str(1);
@@ -258,12 +276,21 @@ void MIBParser::addPrimaryType(const std::string block, Type &type) {
         // type.primaryType = typeStr;
     }
 
-    std::regex rgx2("([\\s\\S]+)\\(([\\d]+)..([\\d]+)\\)");
-    std::smatch match2;
+    std::regex rgxRange(rgxStrRange);
+    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgxRange); i != std::sregex_iterator(); ++i ) {
+        match = *i;
+        for (unsigned i=0; i<match.size(); ++i)
+            std::cout << "Range match #" << i << ": ---" << match[i] << "---" << std::endl;
 
-    for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx2); i != std::sregex_iterator(); ++i ) {
-        match2 = *i;
-        for (unsigned i=0; i<match2.size(); ++i)
-            std::cout << "+++match #" << i << ": ---" << match2[i] << "---" << std::endl;
     }
+
+    // std::regex rgx2("([\\s\\S]+)\\(([\\d]+)..([\\d]+)\\)");
+    // std::smatch match2;
+    //
+    // for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx2); i != std::sregex_iterator(); ++i ) {
+    //     match2 = *i;
+    //     for (unsigned i=0; i<match2.size(); ++i)
+    //         std::cout << "+++match #" << i << ": ---" << match2[i] << "---" << std::endl;
+    // }
+
 }
