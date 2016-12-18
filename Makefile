@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS =-c
 LDFLAGS=-lboost_regex
-SOURCES=Type.cpp Tree.cpp SNMPServer.cpp SNMPDeserializer.cpp MIBParser.cpp main.cpp
+SOURCES=Type.cpp Tree.cpp BerTree.cpp SNMPDeserializer.cpp SNMPSerializer.cpp SNMPServer.cpp MIBParser.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=agent-snmp
 

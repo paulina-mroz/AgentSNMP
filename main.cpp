@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <cstring>
+#include <iostream>
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include <boost/algorithm/string/regex.hpp>
+
 #include "SNMPServer.h"
 #include "SNMPDeserializer.h"
 #include "MIBParser.h"
 #include "defines.h"
+#include "Tree.h"
+#include "externs.h"
 
 int main(int argc, char **argv) {
     DEBUG("Agent SNMP\n");
@@ -25,19 +30,29 @@ int main(int argc, char **argv) {
 
     if (argc == 2) {
         if ((!strcmp(argv[1], "--print_tree")) || (!strcmp(argv[1], "-t"))) {
-            parser1.tree.print_tree();
+            // parser1.tree.print_tree();
+            tree.print_tree();
         }
     } else if (argc == 3) {
-        if ((!strcmp(argv[1], "--print_node")) || (!strcmp(argv[1], "-n"))) {
+        if ((!strcmp(argv[1], "--print_node_name")) || (!strcmp(argv[1], "-n"))) {
             std::string name(argv[2]);
-            parser1.tree.print_node(name);
+            // parser1.tree.print_node(name);
+        }
+        if ((!strcmp(argv[1], "--print_node_oid")) || (!strcmp(argv[1], "-o"))) {
+            std::string name(argv[2]);
+            std::vector<std::string> v;
+            std::vector<int> v_int;
+            boost::split_regex(v, name, boost::regex( "\\." ));
+            for (auto &p : v) {
+                v_int.push_back(std::stoi(p));
+            }
+            // parser1.tree.print_node(v_int);
         }
     }
 
 
-    // SNMPServer serv1;
-    // serv1.initConnection();
-    // serv1.receiveMessage();
+    SNMPServer serverInst;
+    serverInst.flow();
 
 
 

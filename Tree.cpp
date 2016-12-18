@@ -98,6 +98,10 @@ int Tree::findNode(std::vector<int> const& ref) {
     return -1;
 }
 
+// std::vector<Node>::iterator Tree::findNodeIterator(std::vector<int> const& ref) {
+//
+// }
+
 void Tree::print_tree() {
     std::list<std::vector<int>> remainID;
     remainID.push_front(root);
@@ -146,8 +150,25 @@ void Tree::print_tree() {
     }
 }
 
-void Tree::print_node(std::string name) {
+void Tree::print_node(std::string const& name) {
     std::cout << "INFO about: " << name << std::endl;
+    if (findNode(name) < 0) return;
+    Node tmpNode  = node.at(findNode(name));
+    // if (!tmpNode.syntax.empty())
+    //     std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
+    if (!tmpNode.access.empty())
+        std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
+    if (!tmpNode.status.empty())
+        std::cout << "STATUS\n\t" << tmpNode.status << std::endl;
+    if (!tmpNode.description.empty())
+        std::cout << "DESCRIPTION\n\t" << tmpNode.description << std::endl;
+
+}
+
+void Tree::print_node(std::vector<int> const& name) {
+    std::cout << "INFO about: ";
+    print_vector(name);
+    std::cout << std::endl;
     if (findNode(name) < 0) return;
     Node tmpNode  = node.at(findNode(name));
     // if (!tmpNode.syntax.empty())

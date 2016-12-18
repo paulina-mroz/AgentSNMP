@@ -25,6 +25,7 @@
 
 #define PORT            161
 #define RECVBUF_SIZE    1024
+#define SENDBUF_SIZE    1024
 
 
 #endif /* DEFINES_H */

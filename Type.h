@@ -17,6 +17,9 @@ public:
     std::vector<int> range;
     std::map<int, std::string> enumInt;
     std::map<std::string, Type> table;
+
+    std::string name;
+    char ber;
 };
 
 

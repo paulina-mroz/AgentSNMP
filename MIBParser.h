@@ -29,8 +29,8 @@ public:
     void addPrimaryType(const std::string block, Type &type);
     void initPrimaryTypes();
 
-    Tree tree;
-    std::map<std::string, Type> typeMap;
+    // Tree tree;
+    
 
     //enumState state;
     //std::string buffer;

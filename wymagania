@@ -20,3 +20,10 @@ Klasy:
 - SNMPState
 - SNMPTrapMonitor
 
+
+----------------------
+
+BER
+1. Długość - jeżeli nieokreślona, to EOC (2 bajty o wartości 0).
+2. Typy: INTEGER, OCTET STRING, NULL, OBJECT IDENTIFIER, SEQUENCE AND SEQUENCE OF
+3. http://asn1-playground.oss.com/

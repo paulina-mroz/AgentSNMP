@@ -16,6 +16,17 @@ SNMPServer::~SNMPServer(){
     DEBUG("Deconstructor\n");
 }
 
+void SNMPServer::flow() {
+    initConnection();
+    while (1) {
+        receiveMessage();
+        analyzeRequest();
+        createResponse();
+        sendResponse();
+
+    }
+}
+
 void SNMPServer::initConnection(){
     socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -37,22 +48,20 @@ void SNMPServer::initConnection(){
             listen(socketDescriptor,5);
         }
     }
-
 }
 
 void SNMPServer::receiveMessage(){
     int clilen = sizeof(clientAddress);
-    while(1) {
-        DEBUG("Waiting\n");
-        int bufLength;
-        bufLength = recvfrom(socketDescriptor, recvBuf, 1024, 0, (struct sockaddr*)&clientAddress, (socklen_t*)&(clilen));
-        DEBUG("bufLength: %d\n", bufLength);
-        for (int i = 0; i < bufLength; ++i) {
-            DEBUG("0x%02x %c ",recvBuf[i],recvBuf[i]);
-        }
-        printf("\n");
-        deserial1.getSerialData(recvBuf);
-    }
+    // while(1) {
+        printf("Waiting\n");
+        recvBufLength = recvfrom(socketDescriptor, recvBuf, 1024, 0, (struct sockaddr*)&clientAddress, (socklen_t*)&(clilen));
+        // printf("bufLength: %d\n", recvBufLength);
+        // for (int i = 0; i < recvBufLength; ++i) {
+        //     printf("0x%02X ",recvBuf[i]);
+        // }
+        // printf("\n");
+    // }
+
     // clilen = sizeof(cli_addr);
 
     // while(1){
@@ -68,5 +77,35 @@ void SNMPServer::receiveMessage(){
     //     char send_data[] = "Response";
     //     sendto(sockfd,send_data,strlen(send_data),0,(struct sockaddr *)&cli_addr,sizeof(struct sockaddr));
     //     fflush(stdout);
+
+}
+
+void SNMPServer::sendResponse() {
+    recvBuf[13] = 0xA2;
+    sendBufLength = recvBufLength;
+    for (int i = 0; i < sendBufLength; ++i) {
+        sendBuf[i] = recvBuf[i];
+        if (i % 16 == 0) {
+            printf("\n%04d: ", i);
+        }
+        printf("%02X ",sendBuf[i]);
+    }
+    printf("\n");
+    sendto(socketDescriptor,sendBuf,sendBufLength,0,(struct sockaddr *)&clientAddress,sizeof(struct sockaddr));
+    fflush(stdout);
+}
+
+void SNMPServer::analyzeRequest() {
+    DEBUG("Analyze");
+    deserializerInst.readContent(recvBuf, recvBufLength);
+    deserializerInst.makeBerTree();
+    // deserializerInst.berTreeInst.sub.push_back(BerTree(0));
+    // DEBUG("Clear\n");
+    // deserializerInst.berTreeInst.sub.clear();
+
+    // printf("HEX: %X", -129);
+}
+
+void SNMPServer::createResponse() {
 
 }
