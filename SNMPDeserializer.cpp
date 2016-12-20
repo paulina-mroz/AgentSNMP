@@ -57,6 +57,7 @@ void SNMPDeserializer::makeBerTree() {
     // }
     addBerNode(berTreeInst);
     berTreeInst.print_tree(0);
+    // printf("LENGTH TEST: %04X\n", (unsigned char)getLength(berTreeInst.sub.at(0).length));
 }
 
 void SNMPDeserializer::addBerNode(BerTree &bt) {
@@ -109,6 +110,31 @@ void SNMPDeserializer::addBerNode(BerTree &bt) {
     }
 }
 
-long SNMPDeserializer::getLength(std::list<char> berLength) {
+// long SNMPDeserializer::getLength(std::vector<char> berLength) {
+//     long result = 0;
+//     // if (berLength.front() & 0x80) {
+//     //     int lengthOfLength = berLength.front() & 0x7F;
+//     //         for (int i = 0; i < lengthOfLength; ++i) {
+//     //             result = 256*result + (unsigned char)(berLength.at(i+1));
+//     //         }
+//     // } else {
+//     //     result = berLength.front();
+//     // }
+//     return result;
+// }
 
+
+long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
+    long result;
+    bool isSigned = true;
+    for (auto &p : berInt) {
+        if (isSigned) {
+            result = p;
+            isSigned = false;
+        } else {
+            result = 256*result + (unsigned char)p;
+        }
+    }
+    printf("getInt %d\n", result);
+    return result;
 }

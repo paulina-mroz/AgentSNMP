@@ -4,6 +4,7 @@
 #include <string>
 #include "SNMPDeserializer.h"
 #include "SNMPSerializer.h"
+#include "BerTree.h"
 #include "defines.h"
 
 class SNMPServer
@@ -14,9 +15,13 @@ public:
     void flow();
     void initConnection();
     void receiveMessage();
-    void analyzeRequest();
+    bool analyzeRequest();
     void createResponse();
     void sendResponse();
+
+    bool errorInRequest(BerTree &bt);
+    bool checkCommunityString(BerTree &bt);
+    void analyzePDU(BerTree &bt);
 
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;

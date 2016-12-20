@@ -1,3 +1,5 @@
 netstat -lnp
 snmptest -v 2c -c public 127.0.0.1:161
 snmpwalk -v 2c -c public 127.0.0.1:161
+snmpget -d -v 1 -c public 127.0.0.1:161 sysUpTime.0 sysServices.1 sysUpTime.0 sysUpTime.0
+

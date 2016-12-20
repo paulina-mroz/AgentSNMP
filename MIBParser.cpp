@@ -48,6 +48,11 @@ void MIBParser::initPrimaryTypes() {
     typeMap["GETNEXTREQUEST"].ber = 0xA1;
     typeMap["GETRESPONSE"] = Type();
     typeMap["GETRESPONSE"].ber = 0xA2;
+
+    typeMap["INTEGER"] = Type();
+    typeMap["INTEGER"].ber = 0x02;
+    typeMap["OCTET STRING"] = Type();
+    typeMap["OCTET STRING"].ber = 0x04;
     //
     // // for (auto &p : typeMap) {
     // //     std::cout << "INFO " << p.first << std::endl;

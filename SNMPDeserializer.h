@@ -14,7 +14,8 @@ public:
     void makeBerTree();
     void addBerNode(BerTree &bt);
     void readContent(unsigned char data[], int length);
-    long getLength(std::list<char> berLength);
+    // long getLength(std::vector<char> berLength);
+    long getIntValue(std::list<char> &berInt);
 
     BerTree berTreeInst;
     // std::list<char> contentList;

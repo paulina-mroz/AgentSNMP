@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <list>
 
 #include "SNMPServer.h"
 #include "defines.h"
@@ -18,11 +19,19 @@ SNMPServer::~SNMPServer(){
 
 void SNMPServer::flow() {
     initConnection();
+
+    std::list<char> testList = serializerInst.getLengthBer(0);
+    testList = serializerInst.getLengthBer(127);
+    testList = serializerInst.getLengthBer(128);
+    testList = serializerInst.getLengthBer(-1);
+    testList = serializerInst.getLengthBer(500);
+
     while (1) {
         receiveMessage();
-        analyzeRequest();
-        createResponse();
-        sendResponse();
+        if (!analyzeRequest()) {
+            createResponse();
+            sendResponse();
+        }
 
     }
 }
@@ -95,10 +104,32 @@ void SNMPServer::sendResponse() {
     fflush(stdout);
 }
 
-void SNMPServer::analyzeRequest() {
+bool SNMPServer::analyzeRequest() {
     DEBUG("Analyze");
     deserializerInst.readContent(recvBuf, recvBufLength);
     deserializerInst.makeBerTree();
+
+    if (deserializerInst.berTreeInst.sub.size() == 1) {
+        if (deserializerInst.berTreeInst.sub.at(0).type == typeMap["SEQUENCE"].ber) {
+            printf("SEQ OK size %d\n", deserializerInst.berTreeInst.sub.at(0).sub.size());
+            // deserializerInst.berTreeInst.print_tree(0);
+            if (deserializerInst.berTreeInst.sub.at(0).sub.size() == 3) {
+                if ((!errorInRequest(deserializerInst.berTreeInst.sub.at(0).sub.at(0))) && (checkCommunityString(deserializerInst.berTreeInst.sub.at(0).sub.at(0)))) {
+                    // analyzePDU(deserializerInst.berTreeInst.sub.at(0).sub.at(0));
+                    return 0;
+                } else {
+                    // ERROR
+                }
+            } else {
+                // ERROR
+            }
+        } else {
+            // ERROR
+        }
+    } else {
+        // ERROR
+    }
+
     // deserializerInst.berTreeInst.sub.push_back(BerTree(0));
     // DEBUG("Clear\n");
     // deserializerInst.berTreeInst.sub.clear();
@@ -107,5 +138,18 @@ void SNMPServer::analyzeRequest() {
 }
 
 void SNMPServer::createResponse() {
+    serializerInst.berTreeInst.sub.push_back(BerTree());
+
+}
+
+bool SNMPServer::errorInRequest(BerTree &bt) {
+    return !((bt.type == typeMap["INTEGER"].ber) && (deserializerInst.getIntValue(bt.content) == 0));
+}
+
+bool SNMPServer::checkCommunityString(BerTree &bt) {
+    return true;
+}
+
+void SNMPServer::analyzePDU(BerTree &bt) {
 
 }
