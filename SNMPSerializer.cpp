@@ -26,8 +26,8 @@ std::list<char> SNMPSerializer::getLengthBer(long value) {
         return lenghtList;
     }
     while (value) {
-        lenghtList.push_back(value & ((1<<8)-1));
-        printf("%02X ", (unsigned char)lenghtList.back());
+        lenghtList.push_front(value & ((1<<8)-1));
+        printf("%02X ", (unsigned char)lenghtList.front());
         value = value >> 8;
     }
     lenghtList.push_front(lenghtList.size() | (1<<7));
@@ -35,8 +35,46 @@ std::list<char> SNMPSerializer::getLengthBer(long value) {
 }
 
 std::list<char> SNMPSerializer::getIntBer(long value) {
+    // printf("\nGET INT BER ");
+    std::list<char> intList;
+    if (value >= 0) {
+        // do {
+        //     intList.push_back(value & ((1<<8)-1));
+        //     printf("%02X ", (unsigned char)intList.back());
+        //     value = value >> 8;
+        // } while (value != -1);
+        long check = 0x7F;
+        for (int i = 1; i <=8; ++i) {
+            // printf("CHECK %lX\n ", check);
+            if (value <= check) {
+                for (int j = 0; j < i; ++j) {
+                    intList.push_front(value & 0xFF);
+                    value = value >> 8;
+                    // printf("%02X ", (unsigned char)intList.front());
+                }
+                return intList;
+            }
+            check = (check << 8) | 0xFF;
+        }
 
+    } else {
+        long check = (-1);
+        check = (check << 7);
+        for (int i = 1; i <=8; ++i) {
+            // printf("CHECK %lX\n ", check);
+            if (value >= check) {
+                for (int j = 0; j < i; ++j) {
+                    intList.push_front(value & 0xFF);
+                    value = value >> 8;
+                    // printf("%02X ", (unsigned char)intList.front());
+                }
+                return intList;
+            }
+            check = (check << 8);
+        }
+    }
 
+    return intList;
 }
 
 void SNMPSerializer::makeSerialData() {

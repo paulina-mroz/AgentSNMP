@@ -26,6 +26,14 @@ void SNMPServer::flow() {
     testList = serializerInst.getLengthBer(-1);
     testList = serializerInst.getLengthBer(500);
 
+    testList = serializerInst.getIntBer(-128);
+    testList = serializerInst.getIntBer(-129);
+    testList = serializerInst.getIntBer(-1);
+    testList = serializerInst.getIntBer(0);
+    testList = serializerInst.getIntBer(127);
+    testList = serializerInst.getIntBer(128);
+    testList = serializerInst.getIntBer(256);
+
     while (1) {
         receiveMessage();
         if (!analyzeRequest()) {
