@@ -14,12 +14,13 @@ public:
 
     void convert(std::string type);
     void print_tree(int n);
+    void delete_tree();
 
     char type;
     std::list<char> length;
     std::list<char> content;
 
-    std::vector<BerTree> sub;
+    std::vector<BerTree*> sub;
 
 
 };

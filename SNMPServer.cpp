@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <list>
+#include <iostream>
 
 #include "SNMPServer.h"
 #include "defines.h"
@@ -115,14 +116,17 @@ void SNMPServer::sendResponse() {
 bool SNMPServer::analyzeRequest() {
     DEBUG("Analyze");
     deserializerInst.readContent(recvBuf, recvBufLength);
+    // deserializerInst.berTreeInst.sub.clear();
+    deserializerInst.berTreeInst.delete_tree();
+    // delete deserializerInst.berTreeInst.sub.at(0);
     deserializerInst.makeBerTree();
 
     if (deserializerInst.berTreeInst.sub.size() == 1) {
-        if (deserializerInst.berTreeInst.sub.at(0).type == typeMap["SEQUENCE"].ber) {
-            printf("SEQ OK size %d\n", deserializerInst.berTreeInst.sub.at(0).sub.size());
+        if (deserializerInst.berTreeInst.sub.at(0)->type == typeMap["SEQUENCE"].ber) {
+            printf("SEQ OK size %d\n", deserializerInst.berTreeInst.sub.at(0)->sub.size());
             // deserializerInst.berTreeInst.print_tree(0);
-            if (deserializerInst.berTreeInst.sub.at(0).sub.size() == 3) {
-                if ((!errorInRequest(deserializerInst.berTreeInst.sub.at(0).sub.at(0))) && (checkCommunityString(deserializerInst.berTreeInst.sub.at(0).sub.at(0)))) {
+            if (deserializerInst.berTreeInst.sub.at(0)->sub.size() == 3) {
+                if ((checkVersion(*deserializerInst.berTreeInst.sub.at(0)->sub.at(0))) && (checkCommunityString(*deserializerInst.berTreeInst.sub.at(0)->sub.at(1)))) {
                     // analyzePDU(deserializerInst.berTreeInst.sub.at(0).sub.at(0));
                     return 0;
                 } else {
@@ -146,15 +150,39 @@ bool SNMPServer::analyzeRequest() {
 }
 
 void SNMPServer::createResponse() {
-    serializerInst.berTreeInst.sub.push_back(BerTree());
+    // serializerInst.berTreeInst.sub.clear();
+    serializerInst.berTreeInst.delete_tree();
+    serializerInst.berTreeInst.sub.push_back(new BerTree());
+    serializerInst.berTreeInst.sub.at(0)->type = typeMap["SEQUENCE"].ber;
 
+    // Version
+    serializerInst.berTreeInst.sub.at(0)->sub.push_back(new BerTree());
+    serializerInst.berTreeInst.sub.at(0)->sub.at(0)->type = typeMap["INTEGER"].ber;
+    serializerInst.berTreeInst.sub.at(0)->sub.at(0)->content.push_back(0x00);
+
+
+
+    serializerInst.berTreeInst.print_tree(0);
 }
 
-bool SNMPServer::errorInRequest(BerTree &bt) {
-    return !((bt.type == typeMap["INTEGER"].ber) && (deserializerInst.getIntValue(bt.content) == 0));
+bool SNMPServer::checkVersion(BerTree &bt) {
+    return (bt.type == typeMap["INTEGER"].ber) && (deserializerInst.getIntValue(bt.content) == 0);
 }
 
 bool SNMPServer::checkCommunityString(BerTree &bt) {
+    // printf("BBBBBB %02X %02X \n", bt.type, typeMap["OCTET STRING"].ber);
+    if (bt.type != typeMap["OCTET STRING"].ber) return false;
+    // communityString = bt.content;
+    // std::string cs(bt.content.begin(), bt.content.end());
+    communityString = std::string(bt.content.begin(), bt.content.end());
+
+    // for (auto &p : communityString) {
+    //     std::cout << " AAA: " << p;
+    // }
+    std::cout << " CCC " << communityString;
+    isPublic = communityString == "public";
+    isPrivate = communityString == "private";
+    std::cout << "public " << isPublic << " private " << isPrivate;
     return true;
 }
 

@@ -2,6 +2,7 @@
 #define SNMPSERVER_H
 
 #include <string>
+#include <list>
 #include "SNMPDeserializer.h"
 #include "SNMPSerializer.h"
 #include "BerTree.h"
@@ -19,7 +20,7 @@ public:
     void createResponse();
     void sendResponse();
 
-    bool errorInRequest(BerTree &bt);
+    bool checkVersion(BerTree &bt);
     bool checkCommunityString(BerTree &bt);
     void analyzePDU(BerTree &bt);
 
@@ -27,6 +28,9 @@ public:
     SNMPSerializer serializerInst;
 
     int error;
+    std::string communityString;
+    bool isPublic;
+    bool isPrivate;
 
     struct sockaddr_in serverAddress;
     struct sockaddr_in clientAddress;

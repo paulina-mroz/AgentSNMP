@@ -10,10 +10,11 @@ SNMPSerializer::SNMPSerializer() {
 
 SNMPSerializer::~SNMPSerializer() {
     DEBUG("Deconstructor");
+    berTreeInst.delete_tree();
 }
 
 std::list<char> SNMPSerializer::getLengthBer(long value) {
-    printf("\nGET LENGTH BER ");
+    printf("\nGET LENGTH BER (%ld) ", value);
     std::list<char> lenghtList;
     if (value < 0) {
         lenghtList.push_back(0);
@@ -35,7 +36,7 @@ std::list<char> SNMPSerializer::getLengthBer(long value) {
 }
 
 std::list<char> SNMPSerializer::getIntBer(long value) {
-    // printf("\nGET INT BER ");
+    printf("\nGET INT BER (%ld) ", value);
     std::list<char> intList;
     if (value >= 0) {
         // do {
@@ -50,7 +51,7 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
                 for (int j = 0; j < i; ++j) {
                     intList.push_front(value & 0xFF);
                     value = value >> 8;
-                    // printf("%02X ", (unsigned char)intList.front());
+                    printf("%02X ", (unsigned char)intList.front());
                 }
                 return intList;
             }
@@ -66,7 +67,7 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
                 for (int j = 0; j < i; ++j) {
                     intList.push_front(value & 0xFF);
                     value = value >> 8;
-                    // printf("%02X ", (unsigned char)intList.front());
+                    printf("%02X ", (unsigned char)intList.front());
                 }
                 return intList;
             }
