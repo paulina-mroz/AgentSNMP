@@ -27,6 +27,24 @@
 #define RECVBUF_SIZE    1024
 #define SENDBUF_SIZE    1024
 
+// noError(0)
+// There was no problem performing the request.
+//
+// tooBig(1)
+// The response to your request was too big to fit into one response.
+//
+// noSuchName(2)
+// An agent was asked to get or set an OID that it can't find; i.e., the OID doesn't exist.
+//
+// badValue(3)
+// A read-write or write-only object was set to an inconsistent value.
+//
+// readOnly(4)
+// This error is generally not used. The noSuchName error is equivalent to this one.
+//
+// genErr(5)
+// This is a catch-all error. If an error occurs for which none of the previous messages is appropriate, a genError is issued.
+
 
 #endif /* DEFINES_H */
 

@@ -16,21 +16,26 @@ public:
     void flow();
     void initConnection();
     void receiveMessage();
-    bool analyzeRequest();
+    void analyzeRequest();
     void createResponse();
     void sendResponse();
 
     bool checkVersion(BerTree &bt);
     bool checkCommunityString(BerTree &bt);
-    void analyzePDU(BerTree &bt);
+    bool checkPDU(BerTree &bt);
+    void analyzePDU();
 
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;
 
     int error;
     std::string communityString;
-    bool isPublic;
-    bool isPrivate;
+    // bool isPublic;
+    // bool isPrivate;
+    bool correctRequest;
+    bool permissionRO;
+    bool permissionRW;
+    std::list<char> requestID;
 
     struct sockaddr_in serverAddress;
     struct sockaddr_in clientAddress;

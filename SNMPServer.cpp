@@ -21,23 +21,25 @@ SNMPServer::~SNMPServer(){
 void SNMPServer::flow() {
     initConnection();
 
-    std::list<char> testList = serializerInst.getLengthBer(0);
-    testList = serializerInst.getLengthBer(127);
-    testList = serializerInst.getLengthBer(128);
-    testList = serializerInst.getLengthBer(-1);
-    testList = serializerInst.getLengthBer(500);
-
-    testList = serializerInst.getIntBer(-128);
-    testList = serializerInst.getIntBer(-129);
-    testList = serializerInst.getIntBer(-1);
-    testList = serializerInst.getIntBer(0);
-    testList = serializerInst.getIntBer(127);
-    testList = serializerInst.getIntBer(128);
-    testList = serializerInst.getIntBer(256);
+    // std::list<char> testList = serializerInst.getLengthBer(0);
+    // testList = serializerInst.getLengthBer(127);
+    // testList = serializerInst.getLengthBer(128);
+    // testList = serializerInst.getLengthBer(-1);
+    // testList = serializerInst.getLengthBer(500);
+    //
+    // testList = serializerInst.getIntBer(-128);
+    // testList = serializerInst.getIntBer(-129);
+    // testList = serializerInst.getIntBer(-1);
+    // testList = serializerInst.getIntBer(0);
+    // testList = serializerInst.getIntBer(127);
+    // testList = serializerInst.getIntBer(128);
+    // testList = serializerInst.getIntBer(256);
 
     while (1) {
         receiveMessage();
-        if (!analyzeRequest()) {
+        analyzeRequest();
+        if (correctRequest) {
+            analyzePDU();
             createResponse();
             sendResponse();
         }
@@ -72,7 +74,7 @@ void SNMPServer::receiveMessage(){
     int clilen = sizeof(clientAddress);
     // while(1) {
         printf("Waiting\n");
-        recvBufLength = recvfrom(socketDescriptor, recvBuf, 1024, 0, (struct sockaddr*)&clientAddress, (socklen_t*)&(clilen));
+        recvBufLength = recvfrom(socketDescriptor, recvBuf, RECVBUF_SIZE, 0, (struct sockaddr*)&clientAddress, (socklen_t*)&(clilen));
         // printf("bufLength: %d\n", recvBufLength);
         // for (int i = 0; i < recvBufLength; ++i) {
         //     printf("0x%02X ",recvBuf[i]);
@@ -113,7 +115,7 @@ void SNMPServer::sendResponse() {
     fflush(stdout);
 }
 
-bool SNMPServer::analyzeRequest() {
+void SNMPServer::analyzeRequest() {
     DEBUG("Analyze");
     deserializerInst.readContent(recvBuf, recvBufLength);
     // deserializerInst.berTreeInst.sub.clear();
@@ -121,26 +123,58 @@ bool SNMPServer::analyzeRequest() {
     // delete deserializerInst.berTreeInst.sub.at(0);
     deserializerInst.makeBerTree();
 
-    if (deserializerInst.berTreeInst.sub.size() == 1) {
-        if (deserializerInst.berTreeInst.sub.at(0)->type == typeMap["SEQUENCE"].ber) {
-            printf("SEQ OK size %d\n", deserializerInst.berTreeInst.sub.at(0)->sub.size());
-            // deserializerInst.berTreeInst.print_tree(0);
-            if (deserializerInst.berTreeInst.sub.at(0)->sub.size() == 3) {
-                if ((checkVersion(*deserializerInst.berTreeInst.sub.at(0)->sub.at(0))) && (checkCommunityString(*deserializerInst.berTreeInst.sub.at(0)->sub.at(1)))) {
-                    // analyzePDU(deserializerInst.berTreeInst.sub.at(0).sub.at(0));
-                    return 0;
-                } else {
-                    // ERROR
-                }
-            } else {
-                // ERROR
-            }
-        } else {
-            // ERROR
-        }
-    } else {
-        // ERROR
+    permissionRO = false;
+    permissionRW = false;
+    communityString.clear();
+    requestID.clear();
+
+    if (deserializerInst.berTreeInst.sub.size() != 1) {
+        correctRequest = false;
+        return;
     }
+    if (deserializerInst.berTreeInst.sub.at(0)->type != typeMap["SEQUENCE"].ber) {
+        correctRequest = false;
+        return;
+    }
+    if (deserializerInst.berTreeInst.sub.at(0)->sub.size() != 3) {
+        correctRequest = false;
+        return;
+    }
+    if (!checkVersion(*deserializerInst.berTreeInst.sub.at(0)->sub.at(0))) {
+        correctRequest = false;
+        return;
+    }
+    if (!checkCommunityString(*deserializerInst.berTreeInst.sub.at(0)->sub.at(1))) {
+        correctRequest = false;
+        return;
+    }
+    if (!checkPDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2))) {
+        correctRequest = false;
+        return;
+    }
+    printf("Request correct :)\n");
+    correctRequest = true;
+
+    // if (deserializerInst.berTreeInst.sub.size() == 1) {
+    //     if (deserializerInst.berTreeInst.sub.at(0)->type == typeMap["SEQUENCE"].ber) {
+    //         printf("SEQ OK size %d\n", deserializerInst.berTreeInst.sub.at(0)->sub.size());
+    //         // deserializerInst.berTreeInst.print_tree(0);
+    //         if (deserializerInst.berTreeInst.sub.at(0)->sub.size() == 3) {
+    //             if ((checkVersion(*deserializerInst.berTreeInst.sub.at(0)->sub.at(0))) && (checkCommunityString(*deserializerInst.berTreeInst.sub.at(0)->sub.at(1)))) {
+    //                 // analyzePDU(deserializerInst.berTreeInst.sub.at(0).sub.at(0));
+    //
+    //             } else {
+    //                 // ERROR
+    //             }
+    //         } else {
+    //             // ERROR
+    //         }
+    //     } else {
+    //         // ERROR
+    //     }
+    // } else {
+    //     // ERROR
+    // }
 
     // deserializerInst.berTreeInst.sub.push_back(BerTree(0));
     // DEBUG("Clear\n");
@@ -170,22 +204,56 @@ bool SNMPServer::checkVersion(BerTree &bt) {
 }
 
 bool SNMPServer::checkCommunityString(BerTree &bt) {
-    // printf("BBBBBB %02X %02X \n", bt.type, typeMap["OCTET STRING"].ber);
     if (bt.type != typeMap["OCTET STRING"].ber) return false;
-    // communityString = bt.content;
-    // std::string cs(bt.content.begin(), bt.content.end());
+
     communityString = std::string(bt.content.begin(), bt.content.end());
+    if (communityString == "public") {
+        permissionRO = true;
+    } else if (communityString == "private") {
+        permissionRO = true;
+        permissionRW = true;
+    }
 
     // for (auto &p : communityString) {
     //     std::cout << " AAA: " << p;
     // }
-    std::cout << " CCC " << communityString;
-    isPublic = communityString == "public";
-    isPrivate = communityString == "private";
-    std::cout << "public " << isPublic << " private " << isPrivate;
+    // std::cout << " CCC " << communityString;
+    // isPublic = communityString == "public";
+    // isPrivate = communityString == "private";
+    // std::cout << "public " << isPublic << " private " << isPrivate;
     return true;
 }
 
-void SNMPServer::analyzePDU(BerTree &bt) {
+bool SNMPServer::checkPDU(BerTree &bt) {
+    if ((bt.type != typeMap["GETREQUEST"].ber) && (bt.type != typeMap["SETREQUEST"].ber) && (bt.type != typeMap["GETNEXTREQUEST"].ber)) {
+        return false;
+    }
+    if (bt.sub.size() != 4) {
+        return false;
+    }
+    if ((bt.sub.at(0)->type != typeMap["INTEGER"].ber) || (bt.sub.at(1)->type != typeMap["INTEGER"].ber)
+        || (bt.sub.at(2)->type != typeMap["INTEGER"].ber) || (bt.sub.at(3)->type != typeMap["SEQUENCE"].ber)) {
+        return false;
+    }
+    if (bt.sub.at(0)->content.size() != 4) {
+        return false;
+    }
+    requestID = bt.sub.at(0)->content;
+    if (bt.sub.at(1)->content.size() != 1) {
+        return false;
+    }
+    if (bt.sub.at(1)->content.front() != 0x00) {
+        return false;
+    }
+    if (bt.sub.at(2)->content.size() != 1) {
+        return false;
+    }
+    if (bt.sub.at(2)->content.front() != 0x00) {
+        return false;
+    }
+    return true;
+}
+
+void SNMPServer::analyzePDU() {
 
 }
