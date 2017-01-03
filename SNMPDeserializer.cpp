@@ -245,7 +245,15 @@ long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
 
 std::vector<int> SNMPDeserializer::getOidValue(std::list<char> &berOid) {
     std::vector<int> oid;
-    oid.push_back(0);
-
+    bool first = true;
+    for (auto &i : berOid) {
+        if (first) {
+            oid.push_back(i/40);
+            oid.push_back(i%40);
+            first = false;
+        } else {
+            oid.push_back(i);
+        }
+    }
     return oid;
 }
