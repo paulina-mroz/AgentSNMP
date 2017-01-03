@@ -12,7 +12,7 @@
 #include "defines.h"
 #include "externs.h"
 
-Tree tree;
+// Tree tree;
 std::map<std::string, Type> typeMap;
 
 MIBParser::MIBParser() {
@@ -27,6 +27,11 @@ MIBParser::MIBParser() {
     // children.push_back(3);
     // root = newID;
 }
+
+// MIBParser::MIBParser(Tree &t) : tree(t) {
+//     DEBUG("Constructor");
+//     initPrimaryTypes();
+// }
 
 MIBParser::~MIBParser() {
     DEBUG("Deconstructor");

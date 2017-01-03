@@ -3,24 +3,24 @@
 #include <cstring>
 #include <iostream>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+// #include <sys/types.h>
+// #include <sys/socket.h>
+// #include <netinet/in.h>
 
 #include <boost/algorithm/string/regex.hpp>
 
-#include "SNMPServer.h"
-#include "SNMPDeserializer.h"
-#include "MIBParser.h"
+#include "AgentClass.h"
 #include "defines.h"
-#include "Tree.h"
 #include "externs.h"
 
 int main(int argc, char **argv) {
     DEBUG("Agent SNMP\n");
-    MIBParser parser1;
-    std::string fn = "mibs/RFC1213-MIB.txt";
-    parser1.parseFile(fn);
+    AgentClass agentInst;
+    agentInst.getMIB();
+
+    // MIBParser parser1;
+    // std::string fn = "mibs/RFC1213-MIB.txt";
+    // parser1.parseFile(fn);
 
     // for (int i=0; i<argc; ++i) {
     //     printf("%d: %s, ",i,argv[i]);
@@ -31,7 +31,8 @@ int main(int argc, char **argv) {
     if (argc == 2) {
         if ((!strcmp(argv[1], "--print_tree")) || (!strcmp(argv[1], "-t"))) {
             // parser1.tree.print_tree();
-            tree.print_tree();
+            // tree.print_tree();
+            agentInst.parserInst.tree.print_tree();
         }
     } else if (argc == 3) {
         if ((!strcmp(argv[1], "--print_node_name")) || (!strcmp(argv[1], "-n"))) {
@@ -51,8 +52,8 @@ int main(int argc, char **argv) {
     }
 
 
-    SNMPServer serverInst;
-    serverInst.flow();
+
+    agentInst.flow();
 
 
 

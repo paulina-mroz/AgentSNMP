@@ -6,6 +6,7 @@
 #include <map>
 #include <list>
 #include "defines.h"
+#include "externs.h"
 #include "BerTree.h"
 
 class SNMPSerializer {
@@ -13,8 +14,11 @@ public:
     SNMPSerializer();
     ~SNMPSerializer();
 
+    void makeResponseSkel(std::string communityString);
+
     std::list<char> getLengthBer(long value);
     std::list<char> getIntBer(long value);
+    void assignBerTreeLength(BerTree& bt);
     void makeSerialData();
 
     BerTree berTreeInst;

@@ -14,29 +14,29 @@ SNMPSerializer::~SNMPSerializer() {
 }
 
 std::list<char> SNMPSerializer::getLengthBer(long value) {
-    printf("\nGET LENGTH BER (%ld) ", value);
+    // printf("\nGET LENGTH BER (%ld) ", value);
     std::list<char> lenghtList;
     if (value < 0) {
         lenghtList.push_back(0);
-        printf("%02X ", lenghtList.back());
+        // printf("%02X ", lenghtList.back());
         return lenghtList;
     }
     if (value < 128) {
         lenghtList.push_back(value);
-        printf("%02X ", lenghtList.back());
+        // printf("%02X ", lenghtList.back());
         return lenghtList;
     }
     while (value) {
         lenghtList.push_front(value & ((1<<8)-1));
-        printf("%02X ", (unsigned char)lenghtList.front());
+        // printf("%02X ", (unsigned char)lenghtList.front());
         value = value >> 8;
     }
     lenghtList.push_front(lenghtList.size() | (1<<7));
-    printf("L: %02X ", (unsigned char)lenghtList.front());
+    // printf("L: %02X ", (unsigned char)lenghtList.front());
 }
 
 std::list<char> SNMPSerializer::getIntBer(long value) {
-    printf("\nGET INT BER (%ld) ", value);
+    // printf("\nGET INT BER (%ld) ", value);
     std::list<char> intList;
     if (value >= 0) {
         // do {
@@ -51,7 +51,7 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
                 for (int j = 0; j < i; ++j) {
                     intList.push_front(value & 0xFF);
                     value = value >> 8;
-                    printf("%02X ", (unsigned char)intList.front());
+                    // printf("%02X ", (unsigned char)intList.front());
                 }
                 return intList;
             }
@@ -67,7 +67,7 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
                 for (int j = 0; j < i; ++j) {
                     intList.push_front(value & 0xFF);
                     value = value >> 8;
-                    printf("%02X ", (unsigned char)intList.front());
+                    // printf("%02X ", (unsigned char)intList.front());
                 }
                 return intList;
             }
@@ -76,6 +76,44 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
     }
 
     return intList;
+}
+
+void SNMPSerializer::makeResponseSkel(std::string communityString) {
+    berTreeInst.delete_tree();
+    berTreeInst.sub.push_back(new BerTree());
+    berTreeInst.sub.at(0)->type = typeMap["SEQUENCE"].ber;
+
+    // Version
+    berTreeInst.sub.at(0)->sub.push_back(new BerTree());
+    berTreeInst.sub.at(0)->sub.at(0)->type = typeMap["INTEGER"].ber;
+    berTreeInst.sub.at(0)->sub.at(0)->content.push_back(0x00);
+
+    berTreeInst.sub.at(0)->sub.push_back(new BerTree());
+    berTreeInst.sub.at(0)->sub.at(1)->type = typeMap["OCTET STRING"].ber;
+    for (auto &cm : communityString) {
+        berTreeInst.sub.at(0)->sub.at(1)->content.push_back(cm);
+    }
+
+    // berTreeInst.sub.at(0)->sub.push_back(new BerTree());
+
+    berTreeInst.print_tree(0);
+
+}
+
+void SNMPSerializer::assignBerTreeLength(BerTree& bt) {
+    if (!bt.sub.empty()) {
+        for (auto &node : bt.sub) {
+            assignBerTreeLength(*node);
+            bt.content.push_back(node->type);
+            for (auto &l : node->length) {
+                bt.content.push_back(l);
+            }
+            for (auto &c : node->content) {
+                bt.content.push_back(c);
+            }
+        }
+    }
+    bt.length = getLengthBer(bt.content.size());
 }
 
 void SNMPSerializer::makeSerialData() {

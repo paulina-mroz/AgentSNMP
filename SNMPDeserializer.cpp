@@ -25,6 +25,106 @@ SNMPDeserializer::~SNMPDeserializer() {
 // 	}
 // }
 
+bool SNMPDeserializer::checkRequest() {
+    berTreeInst.delete_tree();
+    makeBerTree();
+
+    communityString.clear();
+    requestID.clear();
+
+    if (berTreeInst.sub.size() != 1) {
+        return false;
+    }
+    if (berTreeInst.sub.at(0)->type != typeMap["SEQUENCE"].ber) {
+        return false;
+    }
+    if (berTreeInst.sub.at(0)->sub.size() != 3) {
+        return false;
+    }
+    if (!checkVersion(*berTreeInst.sub.at(0)->sub.at(0))) {
+        return false;
+    }
+    if (!checkCommunityString(*berTreeInst.sub.at(0)->sub.at(1))) {
+        return false;
+    }
+    if (!checkPDU(*berTreeInst.sub.at(0)->sub.at(2))) {
+        return false;
+    }
+
+    printf("Request correct :)\n");
+    return true;
+}
+
+bool SNMPDeserializer::checkVersion(BerTree &bt) {
+    return (bt.type == typeMap["INTEGER"].ber) && (getIntValue(bt.content) == 0);
+}
+
+bool SNMPDeserializer::checkCommunityString(BerTree &bt) {
+    if (bt.type != typeMap["OCTET STRING"].ber) {
+        return false;
+    }
+
+    communityString = std::string(bt.content.begin(), bt.content.end());
+    return true;
+}
+
+bool SNMPDeserializer::checkPDU(BerTree &bt) {
+    if ((bt.type != typeMap["GETREQUEST"].ber) && (bt.type != typeMap["SETREQUEST"].ber) && (bt.type != typeMap["GETNEXTREQUEST"].ber)) {
+        return false;
+    }
+    if (bt.sub.size() != 4) {
+        return false;
+    }
+    if ((bt.sub.at(0)->type != typeMap["INTEGER"].ber) || (bt.sub.at(1)->type != typeMap["INTEGER"].ber)
+        || (bt.sub.at(2)->type != typeMap["INTEGER"].ber) || (bt.sub.at(3)->type != typeMap["SEQUENCE"].ber)) {
+        return false;
+    }
+    if (bt.sub.at(0)->content.size() != 4) {
+        return false;
+    }
+    requestID = bt.sub.at(0)->content;
+    if (bt.sub.at(1)->content.size() != 1) {
+        return false;
+    }
+    if (bt.sub.at(1)->content.front() != 0x00) {
+        return false;
+    }
+    if (bt.sub.at(2)->content.size() != 1) {
+        return false;
+    }
+    if (bt.sub.at(2)->content.front() != 0x00) {
+        return false;
+    }
+    if (bt.sub.at(3)->type != typeMap["SEQUENCE"].ber) {
+        return false;
+    }
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void SNMPDeserializer::readContent(unsigned char data[], int length) {
     berTreeInst.content.clear();
     for (int i = 0; i < length; ++i) {
@@ -66,10 +166,10 @@ void SNMPDeserializer::addBerNode(BerTree &bt) {
     std::list<char> cl = bt.content;
 
     while(!cl.empty()) {
-        for (auto &p : cl) {
-            printf("0x%02X ", (unsigned char)p);
-        }
-        printf("\n");
+        // for (auto &p : cl) {
+        //     printf("0x%02X ", (unsigned char)p);
+        // }
+        // printf("\n");
         bt.sub.push_back(new BerTree());
         bt.sub.back()->type = cl.front();
         cl.pop_front();
@@ -87,11 +187,12 @@ void SNMPDeserializer::addBerNode(BerTree &bt) {
                     }
                 } else {
                     // ERROR
+                    return;
                 }
             } else {
                 lengthLong = bt.sub.back()->length.front();
             }
-            printf("LENGTH %d %X\n",lengthLong, lengthLong);
+            // printf("LENGTH %d %X\n",lengthLong, lengthLong);
             if (lengthLong <= cl.size()) {
                 for (long l = 0; l < lengthLong; ++l) {
                     bt.sub.back()->content.push_back(cl.front());
@@ -99,6 +200,7 @@ void SNMPDeserializer::addBerNode(BerTree &bt) {
                 }
             } else {
                 // ERROR
+                return;
             }
             bool isSequence = bt.sub.back()->type == typeMap["SEQUENCE"].ber;
             bool isGetRequest = bt.sub.back()->type == typeMap["GETREQUEST"].ber;
@@ -139,4 +241,11 @@ long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
     }
     printf("getInt %d\n", result);
     return result;
+}
+
+std::vector<int> SNMPDeserializer::getOidValue(std::list<char> &berOid) {
+    std::vector<int> oid;
+    oid.push_back(0);
+
+    return oid;
 }

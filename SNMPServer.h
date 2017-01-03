@@ -1,6 +1,10 @@
 #ifndef SNMPSERVER_H
 #define SNMPSERVER_H
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 #include <string>
 #include <list>
 #include "SNMPDeserializer.h"
@@ -13,17 +17,17 @@ class SNMPServer
 public:
     SNMPServer();
     ~SNMPServer();
-    void flow();
-    void initConnection();
+    void flow(); // NOT
+    bool initConnection();
     void receiveMessage();
-    void analyzeRequest();
+    void analyzeRequest(); // NOT
     void createResponse();
     void sendResponse();
 
-    bool checkVersion(BerTree &bt);
-    bool checkCommunityString(BerTree &bt);
-    bool checkPDU(BerTree &bt);
-    void analyzePDU();
+    bool checkVersion(BerTree &bt); // NOT
+    bool checkCommunityString(BerTree &bt); // NOT
+    bool checkPDU(BerTree &bt); // NOT
+    void analyzePDU(BerTree &bt);
 
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;

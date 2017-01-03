@@ -14,6 +14,7 @@
 class MIBParser {
 public:
     MIBParser();
+    // MIBParser(Tree& t);
     ~MIBParser();
     void parseFile(std::string fileName);
     void getFile(std::string fileName, std::string &content);
@@ -29,8 +30,8 @@ public:
     void addPrimaryType(const std::string block, Type &type);
     void initPrimaryTypes();
 
-    // Tree tree;
-    
+    Tree tree;
+
 
     //enumState state;
     //std::string buffer;

@@ -5,7 +5,7 @@
 #include "Tree.h"
 #include "Type.h"
 
-extern Tree tree;
+// extern Tree tree;
 extern std::map<std::string, Type> typeMap;
 extern std::map <int, std::string> typeBer;
 

@@ -39,7 +39,7 @@ void SNMPServer::flow() {
         receiveMessage();
         analyzeRequest();
         if (correctRequest) {
-            analyzePDU();
+            analyzePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3));
             createResponse();
             sendResponse();
         }
@@ -47,33 +47,34 @@ void SNMPServer::flow() {
     }
 }
 
-void SNMPServer::initConnection(){
+bool SNMPServer::initConnection() {
     socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0);
 
-    if (socketDescriptor < 0){
+    if (socketDescriptor < 0) {
         perror("Error while opening socket");
-        error = -1;
-    } else {
-        DEBUG("Socket opened\n");
-        memset(&serverAddress, 0, sizeof(serverAddress));
-        serverAddress.sin_family = AF_INET;
-        serverAddress.sin_addr.s_addr = INADDR_ANY;
-        serverAddress.sin_port = htons(PORT);
-
-        error = bind(socketDescriptor, (struct sockaddr*) &serverAddress, sizeof(serverAddress));
-        if (error < 0){
-            perror("Error while binding");
-        } else {
-            DEBUG("Bind ok\n");
-            listen(socketDescriptor,5);
-        }
+        return false;
     }
+
+    DEBUG("Socket opened\n");
+    memset(&serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(PORT);
+
+    error = bind(socketDescriptor, (struct sockaddr*) &serverAddress, sizeof(serverAddress));
+    if (error < 0) {
+        perror("Error while binding");
+        return false;
+    }
+
+    DEBUG("Bind ok\n");
+    listen(socketDescriptor,5);
+    return true;
 }
 
 void SNMPServer::receiveMessage(){
     int clilen = sizeof(clientAddress);
     // while(1) {
-        printf("Waiting\n");
         recvBufLength = recvfrom(socketDescriptor, recvBuf, RECVBUF_SIZE, 0, (struct sockaddr*)&clientAddress, (socklen_t*)&(clilen));
         // printf("bufLength: %d\n", recvBufLength);
         // for (int i = 0; i < recvBufLength; ++i) {
@@ -251,9 +252,16 @@ bool SNMPServer::checkPDU(BerTree &bt) {
     if (bt.sub.at(2)->content.front() != 0x00) {
         return false;
     }
+    if (bt.sub.at(3)->type != typeMap["SEQUENCE"].ber) {
+        return false;
+    }
     return true;
 }
 
-void SNMPServer::analyzePDU() {
+void SNMPServer::analyzePDU(BerTree &bt) {
+    bt.print_tree(0);
+
+
+
 
 }
