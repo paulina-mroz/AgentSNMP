@@ -16,6 +16,7 @@ public:
     void getMIB();
     void flow();
     void readContent();
+    void makeContent();
 
     // Tree treeInst;
     MIBParser parserInst;

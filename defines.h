@@ -27,6 +27,12 @@
 #define RECVBUF_SIZE    1024
 #define SENDBUF_SIZE    1024
 
+#define ERROR_NOERROR       0
+#define ERROR_TOOBIG        1
+#define ERROR_NOSUCHNAME    2
+#define ERROR_BADVALUE      3
+#define ERROR_READONLY      4
+#define ERROR_GENERR        5
 // noError(0)
 // There was no problem performing the request.
 //

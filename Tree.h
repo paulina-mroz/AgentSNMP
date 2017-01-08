@@ -4,8 +4,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
 #include "defines.h"
 #include "Type.h"
+#include "Value.h"
 
 class Node {
 public:
@@ -13,6 +15,8 @@ public:
     ~Node();
     bool compareNode(std::string const& ref);
     bool compareNode(std::vector<int> const& ref);
+    int findValue(std::list<int> const& ref);
+    int findChild(int ref);
 
     std::vector<int> oid;
     std::vector<int> child;
@@ -25,7 +29,9 @@ public:
     std::string status;
     std::string description;
     std::vector<std::string> index;
-    std::map<std::vector<int>, std::string> value;
+    // std::map<std::list<char>, std::string> value;
+    std::vector<Type> type;
+    std::vector<Value> value;
 };
 
 class Tree {
@@ -43,6 +49,7 @@ public:
     std::vector<int> root;
     //std::map<std::vector<int>, Node> node;
     std::vector<Node> node;
+
 };
 
 

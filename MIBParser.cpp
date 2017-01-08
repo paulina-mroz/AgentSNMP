@@ -58,6 +58,10 @@ void MIBParser::initPrimaryTypes() {
     typeMap["INTEGER"].ber = 0x02;
     typeMap["OCTET STRING"] = Type();
     typeMap["OCTET STRING"].ber = 0x04;
+    typeMap["OBJECT IDENTIFIER"] = Type();
+    typeMap["OBJECT IDENTIFIER"].ber = 0x06;
+    typeMap["NULL"] = Type();
+    typeMap["NULL"].ber = 0x05;
     //
     // // for (auto &p : typeMap) {
     // //     std::cout << "INFO " << p.first << std::endl;

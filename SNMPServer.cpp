@@ -102,10 +102,10 @@ void SNMPServer::receiveMessage(){
 }
 
 void SNMPServer::sendResponse() {
-    recvBuf[13] = 0xA2;
-    sendBufLength = recvBufLength;
+    // recvBuf[13] = 0xA2;
+    // sendBufLength = recvBufLength;
     for (int i = 0; i < sendBufLength; ++i) {
-        sendBuf[i] = recvBuf[i];
+        // sendBuf[i] = recvBuf[i];
         if (i % 16 == 0) {
             printf("\n%04d: ", i);
         }

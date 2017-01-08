@@ -34,12 +34,14 @@ void AgentClass::flow() {
             serializerInst.makeResponseSkel(deserializerInst.communityString);
             // toolkitInst.makeResponsePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2),*serializerInst.berTreeInst.sub.at(0)->sub.at(2));
             toolkitInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
+
             serializerInst.berTreeInst.print_tree(0);
             printf("CONTENT: ");
             for (auto &c : serializerInst.berTreeInst.content) {
                 printf("%02X ", (unsigned char)c);
             }
             printf("\n");
+            makeContent();
             serverInst.sendResponse();
         }
     }
@@ -55,4 +57,13 @@ void AgentClass::readContent() {
         deserializerInst.berTreeInst.content.push_back(serverInst.recvBuf[i]);
     }
     printf("\n");
+}
+
+void AgentClass::makeContent() {
+    int i = 0;
+    for (auto &c : serializerInst.berTreeInst.content) {
+        serverInst.sendBuf[i] = c;
+        i++;
+    }
+    serverInst.sendBufLength = serializerInst.berTreeInst.content.size();
 }

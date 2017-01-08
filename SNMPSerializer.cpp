@@ -79,6 +79,7 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
 }
 
 void SNMPSerializer::makeResponseSkel(std::string communityString) {
+    berTreeInst.content.clear();
     berTreeInst.delete_tree();
     berTreeInst.sub.push_back(new BerTree());
     berTreeInst.sub.at(0)->type = typeMap["SEQUENCE"].ber;
@@ -102,6 +103,7 @@ void SNMPSerializer::makeResponseSkel(std::string communityString) {
 
 void SNMPSerializer::assignBerTreeLength(BerTree& bt) {
     if (!bt.sub.empty()) {
+        bt.content.clear();
         for (auto &node : bt.sub) {
             assignBerTreeLength(*node);
             bt.content.push_back(node->type);

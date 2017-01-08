@@ -11,8 +11,8 @@ Node::Node() {
     DEBUG("Constructor");
     child.clear();
     oid.clear();
-    //name.clear();
-    name = "fff";
+    name.clear();
+    // name = "fff";
 }
 
 Node::~Node() {
@@ -32,6 +32,23 @@ bool Node::compareNode(std::vector<int> const& ref) {
     }
 }
 
+int Node::findValue(std::list<int> const& ref) {
+    for (int i = 0; i < value.size(); ++i) {
+        if (value.at(i).compareNode(ref)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int Node::findChild(int ref) {
+    for (int i = 0; i < child.size(); ++i) {
+        if (child.at(i) == ref) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 Tree::Tree() {
@@ -97,6 +114,8 @@ int Tree::findNode(std::vector<int> const& ref) {
     }
     return -1;
 }
+
+
 
 // std::vector<Node>::iterator Tree::findNodeIterator(std::vector<int> const& ref) {
 //
