@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     } else if (argc == 3) {
         if ((!strcmp(argv[1], "--print_node_name")) || (!strcmp(argv[1], "-n"))) {
             std::string name(argv[2]);
-            // parser1.tree.print_node(name);
+            agentInst.parserInst.tree.print_node(name);
         }
         if ((!strcmp(argv[1], "--print_node_oid")) || (!strcmp(argv[1], "-o"))) {
             std::string name(argv[2]);
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
             for (auto &p : v) {
                 v_int.push_back(std::stoi(p));
             }
-            // parser1.tree.print_node(v_int);
+            agentInst.parserInst.tree.print_node(v_int);
         }
     }
 

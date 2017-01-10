@@ -173,6 +173,10 @@ void Tree::print_node(std::string const& name) {
     std::cout << "INFO about: " << name << std::endl;
     if (findNode(name) < 0) return;
     Node tmpNode  = node.at(findNode(name));
+    std::cout << "NAME\n\t" << tmpNode.name << std::endl;
+    std::cout << "OID\n\t";
+    print_vector(tmpNode.oid);
+    std::cout << std::endl;
     // if (!tmpNode.syntax.empty())
     //     std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
     if (!tmpNode.access.empty())
@@ -190,6 +194,10 @@ void Tree::print_node(std::vector<int> const& name) {
     std::cout << std::endl;
     if (findNode(name) < 0) return;
     Node tmpNode  = node.at(findNode(name));
+    std::cout << "NAME\n\t" << tmpNode.name << std::endl;
+    std::cout << "OID\n\t";
+    print_vector(tmpNode.oid);
+    std::cout << std::endl;
     // if (!tmpNode.syntax.empty())
     //     std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
     if (!tmpNode.access.empty())
