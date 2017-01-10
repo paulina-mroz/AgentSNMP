@@ -30,10 +30,10 @@ void AgentClass::flow() {
         if (!deserializerInst.checkRequest()) {
             printf("Wrong request :(\n");
         } else {
-            toolkitInst.getPermissions(deserializerInst.communityString);
+            responseInst.getPermissions(deserializerInst.communityString);
             serializerInst.makeResponseSkel(deserializerInst.communityString);
-            // toolkitInst.makeResponsePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2),*serializerInst.berTreeInst.sub.at(0)->sub.at(2));
-            toolkitInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
+            // responseInst.makeResponsePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2),*serializerInst.berTreeInst.sub.at(0)->sub.at(2));
+            responseInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
 
             serializerInst.berTreeInst.print_tree(0);
             printf("CONTENT: ");

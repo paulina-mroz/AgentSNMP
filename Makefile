@@ -3,7 +3,7 @@ CFLAGS=-c
 LDFLAGS=-lboost_regex
 SOURCES=Type.cpp Value.cpp Tree.cpp BerTree.cpp \
 		SNMPDeserializer.cpp SNMPSerializer.cpp SNMPServer.cpp \
-		MIBParser.cpp MIBToolkit.cpp \
+		MIBParser.cpp PDUResponse.cpp MIBToolkit.cpp \
 		AgentClass.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=agent-snmp

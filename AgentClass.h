@@ -5,7 +5,7 @@
 // #include "Tree.h"
 #include "MIBParser.h"
 #include "SNMPServer.h"
-#include "MIBToolkit.h"
+#include "PDUResponse.h"
 #include "SNMPDeserializer.h"
 #include "SNMPSerializer.h"
 
@@ -23,7 +23,7 @@ public:
     SNMPServer serverInst;
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;
-    MIBToolkit toolkitInst;
+    PDUResponse responseInst;
 
 };
 
