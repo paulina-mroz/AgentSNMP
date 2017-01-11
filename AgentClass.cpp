@@ -30,19 +30,22 @@ void AgentClass::flow() {
         if (!deserializerInst.checkRequest()) {
             printf("Wrong request :(\n");
         } else {
-            responseInst.getPermissions(deserializerInst.communityString);
-            serializerInst.makeResponseSkel(deserializerInst.communityString);
-            // responseInst.makeResponsePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2),*serializerInst.berTreeInst.sub.at(0)->sub.at(2));
-            responseInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
+            if (responseInst.getPermissions(deserializerInst.communityString)) {
+                serializerInst.makeResponseSkel(deserializerInst.communityString);
+                // responseInst.makeResponsePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2),*serializerInst.berTreeInst.sub.at(0)->sub.at(2));
+                responseInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
 
-            serializerInst.berTreeInst.print_tree(0);
-            printf("CONTENT: ");
-            for (auto &c : serializerInst.berTreeInst.content) {
-                printf("%02X ", (unsigned char)c);
+                serializerInst.berTreeInst.print_tree(0);
+                printf("CONTENT: ");
+                for (auto &c : serializerInst.berTreeInst.content) {
+                    printf("%02X ", (unsigned char)c);
+                }
+                printf("\n");
+                makeContent();
+                serverInst.sendResponse();
+            } else {
+                printf("Do not got permissions :(\n");
             }
-            printf("\n");
-            makeContent();
-            serverInst.sendResponse();
         }
     }
 }

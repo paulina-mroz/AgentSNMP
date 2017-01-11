@@ -177,8 +177,8 @@ void Tree::print_node(std::string const& name) {
     std::cout << "OID\n\t";
     print_vector(tmpNode.oid);
     std::cout << std::endl;
-    // if (!tmpNode.syntax.empty())
-    //     std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
+    if (!tmpNode.syntax.empty())
+        std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
     if (!tmpNode.access.empty())
         std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
     if (!tmpNode.status.empty())
@@ -198,8 +198,8 @@ void Tree::print_node(std::vector<int> const& name) {
     std::cout << "OID\n\t";
     print_vector(tmpNode.oid);
     std::cout << std::endl;
-    // if (!tmpNode.syntax.empty())
-    //     std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
+    if (!tmpNode.syntax.empty())
+        std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
     if (!tmpNode.access.empty())
         std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
     if (!tmpNode.status.empty())

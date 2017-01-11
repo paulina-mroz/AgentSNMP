@@ -23,8 +23,8 @@ public:
     std::map<int, std::vector<Node>::iterator> childp;
     std::string name;
 
-    // std::string syntax;
-    Type syntax;
+    std::string syntax;
+    // Type syntax;
     std::string access;
     std::string status;
     std::string description;

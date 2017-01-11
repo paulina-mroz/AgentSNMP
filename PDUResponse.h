@@ -12,7 +12,7 @@ class PDUResponse {
 public:
     PDUResponse();
     ~PDUResponse();
-    void getPermissions(std::string communityString);
+    bool getPermissions(std::string communityString);
     // void makeResponsePDU(BerTree &dbt, BerTree &sbt);
     void makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree &tree);
     void makeSkelPDU(SNMPSerializer &si);

@@ -13,16 +13,20 @@ PDUResponse::~PDUResponse(){
     DEBUG("Deconstructor\n");
 }
 
-void PDUResponse::getPermissions(std::string communityString) {
+bool PDUResponse::getPermissions(std::string communityString) {
     permissionRO = false;
     permissionRW = false;
 
     if (communityString == "public") {
         permissionRO = true;
-    } else if (communityString == "private") {
+        return true;
+    }
+    if (communityString == "private") {
         permissionRO = true;
         permissionRW = true;
+        return true;
     }
+    return false;
 }
 
 void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree &tree) {

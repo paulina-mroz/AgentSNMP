@@ -52,6 +52,18 @@ int main(int argc, char **argv) {
     }
 
 
+    printf("seze of long: %d, int %d\n", sizeof(long), sizeof(int));
+    std::list<char> testList;
+    testList = agentInst.serializerInst.getIntBer((long)1<<32-1);
+    for (auto &p : testList) {
+        printf("%02X ", (unsigned char) p);
+    }
+    printf("\n");
+    testList = agentInst.serializerInst.getIntBer(-(long)(1<<32)+1);
+    for (auto &p : testList) {
+        printf("%02X ", (unsigned char) p);
+    }
+    printf("\n");
 
     agentInst.flow();
 

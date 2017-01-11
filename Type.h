@@ -13,12 +13,17 @@ public:
     void print_info();
 
     std::string primaryType;
-    std::vector<int> size;
-    std::vector<int> range;
-    std::map<int, std::string> enumInt;
-    std::map<std::string, Type> table;
+    std::vector<long> size;
+    std::vector<long> range;
+    struct enumInt {
+       int n;
+       std::string s;
+    };
+    std::vector<enumInt> enumInts;
+    // std::map<int, std::string> enumInt;
+    // std::map<std::string, Type> table;
 
-    std::string name;
+    // std::string name;
     char ber;
 };
 
