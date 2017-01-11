@@ -4,6 +4,8 @@
 #include <vector>
 #include <list>
 
+#include <boost/algorithm/string/join.hpp>
+
 #include "Tree.h"
 #include "defines.h"
 
@@ -48,6 +50,32 @@ int Node::findChild(int ref) {
         }
     }
     return -1;
+}
+
+void Node::print_info() {
+    std::cout << "NAME\n\t" << name << std::endl;
+    std::cout << "OID\n\t";
+    for (auto &v : oid) {
+        printf("%d.", v);
+    }
+    std::cout << std::endl;
+    if (!syntax.empty())
+        std::cout << "SYNTAX\n\t" << syntax << std::endl;
+    if (!access.empty())
+        std::cout << "ACCESS\n\t" << access << std::endl;
+    if (!status.empty())
+        std::cout << "STATUS\n\t" << status << std::endl;
+    if (!description.empty())
+        std::cout << "DESCRIPTION\n\t" << description << std::endl;
+    if (!value.empty()) {
+        std::cout << "VALUES\n\t";
+        for (auto &v : value) {
+            for (auto &vid : v.id) {
+                printf("%d.", vid);
+            }
+            std::cout << " " << v.value << std::endl;
+        }
+    }
 }
 
 
@@ -172,20 +200,7 @@ void Tree::print_tree() {
 void Tree::print_node(std::string const& name) {
     std::cout << "INFO about: " << name << std::endl;
     if (findNode(name) < 0) return;
-    Node tmpNode  = node.at(findNode(name));
-    std::cout << "NAME\n\t" << tmpNode.name << std::endl;
-    std::cout << "OID\n\t";
-    print_vector(tmpNode.oid);
-    std::cout << std::endl;
-    if (!tmpNode.syntax.empty())
-        std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
-    if (!tmpNode.access.empty())
-        std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
-    if (!tmpNode.status.empty())
-        std::cout << "STATUS\n\t" << tmpNode.status << std::endl;
-    if (!tmpNode.description.empty())
-        std::cout << "DESCRIPTION\n\t" << tmpNode.description << std::endl;
-
+    node.at(findNode(name)).print_info();
 }
 
 void Tree::print_node(std::vector<int> const& name) {
@@ -193,20 +208,7 @@ void Tree::print_node(std::vector<int> const& name) {
     print_vector(name);
     std::cout << std::endl;
     if (findNode(name) < 0) return;
-    Node tmpNode  = node.at(findNode(name));
-    std::cout << "NAME\n\t" << tmpNode.name << std::endl;
-    std::cout << "OID\n\t";
-    print_vector(tmpNode.oid);
-    std::cout << std::endl;
-    if (!tmpNode.syntax.empty())
-        std::cout << "SYNTAX\n\t" << tmpNode.syntax << std::endl;
-    if (!tmpNode.access.empty())
-        std::cout << "ACCESS\n\t" << tmpNode.access << std::endl;
-    if (!tmpNode.status.empty())
-        std::cout << "STATUS\n\t" << tmpNode.status << std::endl;
-    if (!tmpNode.description.empty())
-        std::cout << "DESCRIPTION\n\t" << tmpNode.description << std::endl;
-
+    node.at(findNode(name)).print_info();
 }
 
 void Tree::print_vector(std::vector<int> v) {

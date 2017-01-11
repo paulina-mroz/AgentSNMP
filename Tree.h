@@ -17,6 +17,8 @@ public:
     bool compareNode(std::vector<int> const& ref);
     int findValue(std::list<int> const& ref);
     int findChild(int ref);
+    void print_info();
+
 
     std::vector<int> oid;
     std::vector<int> child;
@@ -44,7 +46,6 @@ public:
     void print_node(std::string const& name);
     void print_node(std::vector<int> const& name);
     void print_vector(std::vector<int> v);
-
 
     std::vector<int> root;
     //std::map<std::vector<int>, Node> node;

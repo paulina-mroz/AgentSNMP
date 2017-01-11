@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "MIBToolkit.h"
+#include "Value.h"
 #include "defines.h"
 
 MIBToolkit::MIBToolkit(){
@@ -11,4 +12,16 @@ MIBToolkit::MIBToolkit(){
 
 MIBToolkit::~MIBToolkit(){
     DEBUG("Deconstructor\n");
+}
+
+void MIBToolkit::setHardcodedValues(Tree &tree) {
+    int index = -1;
+    index = tree.findNode("sysDescr");
+    if (index > -1) {
+        Value v;
+        v.id.push_back(0);
+        v.value = "DESCRIPTION TesT";
+        tree.node.at(index).value.push_back(v);
+    }
+
 }

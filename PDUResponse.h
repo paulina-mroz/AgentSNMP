@@ -19,6 +19,7 @@ public:
     void makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si);
     bool checkOidExistence(SNMPDeserializer &di, Tree &tree);
     bool checkOidExistenceNext(SNMPDeserializer &di, Tree &tree);
+    bool checkAccessibility(Tree &tree);
 
     std::list<char> requestID;
     bool permissionRO;

@@ -50,6 +50,8 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
     }
     printf("Varbind OID correct :)\n");
 
+    // checkAccessibility(tree);
+
 }
 
 void PDUResponse::makeSkelPDU(SNMPSerializer &si) {
@@ -135,6 +137,7 @@ bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
                 oid.pop_back();
             }
         }
+        printf("Varbind OID index %d\n", oidIndex);
         if (oidIndex < 0) {
             errorIndex = varbindCount;
             errorValue = ERROR_NOSUCHNAME;
@@ -142,6 +145,7 @@ bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
         }
         oidList.push_back(oidIndex);
         valueIndex = tree.node.at(oidIndex).findValue(valueID);
+        printf("Varbind value index %d\n", valueIndex);
         if (valueIndex < 0) {
             errorIndex = varbindCount;
             errorValue = ERROR_NOSUCHNAME;
@@ -241,6 +245,13 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
             valueList.push_back(valueIndex+1);
         }
 
+    }
+    return true;
+}
+
+bool PDUResponse::checkAccessibility(Tree &tree) {
+    for (auto &p : oidList) {
+        // v_int.push_back(std::stoi(p));
     }
     return true;
 }

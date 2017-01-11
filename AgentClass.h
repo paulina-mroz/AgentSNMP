@@ -8,12 +8,13 @@
 #include "PDUResponse.h"
 #include "SNMPDeserializer.h"
 #include "SNMPSerializer.h"
+#include "MIBToolkit.h"
 
 class AgentClass {
 public:
     AgentClass();
     ~AgentClass();
-    void getMIB();
+    void init();
     void flow();
     void readContent();
     void makeContent();
@@ -24,6 +25,7 @@ public:
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;
     PDUResponse responseInst;
+    MIBToolkit toolkitInst;
 
 };
 

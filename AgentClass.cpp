@@ -13,9 +13,10 @@ AgentClass::~AgentClass(){
     DEBUG("Deconstructor\n");
 }
 
-void AgentClass::getMIB() {
+void AgentClass::init() {
     std::string fileMIB = "mibs/RFC1213-MIB.txt";
     parserInst.parseFile(fileMIB);
+    toolkitInst.setHardcodedValues(parserInst.tree);
 }
 void AgentClass::flow() {
     if (!serverInst.initConnection()) {

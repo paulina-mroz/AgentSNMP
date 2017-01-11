@@ -65,10 +65,10 @@ void MIBParser::initPrimaryTypes() {
     typeMap["PhysAddress"].ber = typeMap["OCTET STRING"].ber;
     typeMap["PhysAddress"].primaryType = "OCTET STRING";
 
-    for (auto &p : typeMap) {
-        std::cout << "INFO " << p.first << std::endl;
-        p.second.print_info();
-    }
+    // for (auto &p : typeMap) {
+    //     std::cout << "INFO " << p.first << std::endl;
+    //     p.second.print_info();
+    // }
     std::map <int, std::string> typeBer;
     typeBer[0x02] = "INTEGER";
     typeBer[0x04] = "OCTET STRING";
@@ -166,10 +166,10 @@ void MIBParser::handleImports(const std::string &block) {
                 handleObjectID(contentImport);
                 handleTypeImplicit(contentImport);
             }
-            for (auto &p : typeMap) {
-                std::cout << "INFO " << p.first << std::endl;
-                p.second.print_info();
-            }
+            // for (auto &p : typeMap) {
+            //     std::cout << "INFO " << p.first << std::endl;
+            //     p.second.print_info();
+            // }
         }
 
     }
@@ -230,8 +230,8 @@ void MIBParser::handleObjectType(const std::string &block) {
         tree.node.at(tree.findNode(name)).type.push_back(Type());
         addType(tree.node.at(tree.findNode(name)).syntax, tree.node.at(tree.findNode(name)).type.back());
         tree.node.at(tree.findNode(name)).type.back().ber = typeMap[tree.node.at(tree.findNode(name)).type.back().primaryType].ber;
-        std::cout << "INFO " << name << std::endl;
-        tree.node.at(tree.findNode(name)).type.back().print_info();
+        // std::cout << "INFO " << name << std::endl;
+        // tree.node.at(tree.findNode(name)).type.back().print_info();
     }
 
 }
@@ -290,8 +290,8 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        for (unsigned i=0; i<match.size(); ++i)
-            std::cout << "IMPLICIT match #" << i << ": " << match[i] << std::endl;
+        // for (unsigned i=0; i<match.size(); ++i)
+        //     std::cout << "IMPLICIT match #" << i << ": " << match[i] << std::endl;
         std::string name = match.str(1);
         int implicitNumber = std::stoi(match.str(2));
         const std::string blockType = match.str(3);
@@ -313,7 +313,7 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
 
 
 void MIBParser::addType(const std::string block, Type &type) {
-    std::cout << "ADD TYPE: " << block << std::endl;
+    // std::cout << "ADD TYPE: " << block << std::endl;
 
     std::string rgxStrPartPrim = "[ ]*([\\w]+[ ]*[\\w]*)[ ]*";
     std::string rgxStrPrim = "^" + rgxStrPartPrim + "$";

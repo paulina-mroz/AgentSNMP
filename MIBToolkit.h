@@ -13,6 +13,8 @@ public:
     MIBToolkit();
     ~MIBToolkit();
 
+    void setHardcodedValues(Tree &tree);
+
 };
 
 
