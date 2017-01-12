@@ -17,29 +17,12 @@ class SNMPServer
 public:
     SNMPServer();
     ~SNMPServer();
-    void flow(); // NOT
     bool initConnection();
     void receiveMessage();
-    void analyzeRequest(); // NOT
-    void createResponse();
     void sendResponse();
-
-    bool checkVersion(BerTree &bt); // NOT
-    bool checkCommunityString(BerTree &bt); // NOT
-    bool checkPDU(BerTree &bt); // NOT
-    void analyzePDU(BerTree &bt);
 
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;
-
-    int error;
-    std::string communityString;
-    // bool isPublic;
-    // bool isPrivate;
-    bool correctRequest;
-    bool permissionRO;
-    bool permissionRW;
-    std::list<char> requestID;
 
     struct sockaddr_in serverAddress;
     struct sockaddr_in clientAddress;
@@ -49,6 +32,5 @@ public:
     int recvBufLength;
     int sendBufLength;
 };
-
 
 #endif /* SNMPSERVER_H */

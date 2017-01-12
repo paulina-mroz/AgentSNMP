@@ -14,24 +14,22 @@ public:
     Node();
     ~Node();
     bool compareNode(std::string const& ref);
-    bool compareNode(std::vector<int> const& ref);
-    int findValue(std::list<int> const& ref);
-    int findChild(int ref);
+    bool compareNode(std::vector<long> const& ref);
+    int findValue(std::list<long> const& ref);
+    int findChild(long ref);
     void print_info();
 
-
-    std::vector<int> oid;
-    std::vector<int> child;
-    std::map<int, std::vector<Node>::iterator> childp;
+    std::vector<long> oid;
+    std::vector<long> child;
+    std::map<long, std::vector<Node>::iterator> childp;
     std::string name;
 
     std::string syntax;
-    // Type syntax;
     std::string access;
     std::string status;
     std::string description;
     std::vector<std::string> index;
-    // std::map<std::list<char>, std::string> value;
+
     Type type;
     std::vector<Value> value;
 };
@@ -41,18 +39,14 @@ public:
     Tree();
     ~Tree();
     int findNode(std::string const& ref);
-    int findNode(std::vector<int> const& ref);
+    int findNode(std::vector<long> const& ref);
     void print_tree();
     void print_node(std::string const& name);
-    void print_node(std::vector<int> const& name);
-    void print_vector(std::vector<int> v);
+    void print_node(std::vector<long> const& name);
+    void print_vector(std::vector<long> v);
 
-    std::vector<int> root;
-    //std::map<std::vector<int>, Node> node;
+    std::vector<long> root;
     std::vector<Node> node;
-
 };
-
-
 
 #endif /* TREE_H */

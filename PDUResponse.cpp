@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -10,11 +11,9 @@
 #include "defines.h"
 
 PDUResponse::PDUResponse(){
-    DEBUG("Constructor\n");
 }
 
 PDUResponse::~PDUResponse(){
-    DEBUG("Deconstructor\n");
 }
 
 void PDUResponse::initPermissions(std::string fileName) {
@@ -40,7 +39,6 @@ void PDUResponse::initPermissions(std::string fileName) {
 
                 if (!exist) {
                     permissionStruct ps;
-
                     ps.cs = match.str(2);
                     if (match.str(1) == "rocommunity") {
                         ps.read = true;
@@ -82,17 +80,13 @@ void PDUResponse::initPermissions(std::string fileName) {
                             }
                         }
                     }
-
                     permissions.push_back(ps);
                 }
             }
-
         }
         myfile.close();
     }
-
 }
-
 
 bool PDUResponse::getPermissions(std::string communityString, unsigned long menagerIP) {
     permissionRead = false;
@@ -108,24 +102,11 @@ bool PDUResponse::getPermissions(std::string communityString, unsigned long mena
                 return false;
             }
         }
-
-
     }
-
-    // if (communityString == "public") {
-    //     permissionRead = true;
-    //     return true;
-    // }
-    // if (communityString == "private") {
-    //     permissionRead = true;
-    //     permissionWrite = true;
-    //     return true;
-    // }
     return false;
 }
 
 void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree &tree) {
-// void PDUResponse::makeResponsePDU(BerTree &dbt, BerTree &sbt) {
     bool correct = false;
     requestType = di.berTreeInst.sub.at(0)->sub.at(2)->type;
 
@@ -162,10 +143,8 @@ void PDUResponse::makeSkelPDU(SNMPSerializer &si) {
     }
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.push_back(new BerTree());
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->type = typeMap["INTEGER"].ber;
-    // si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(0);
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.push_back(new BerTree());
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->type = typeMap["INTEGER"].ber;
-    // si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(0);
 
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.push_back(new BerTree());
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->type = typeMap["SEQUENCE"].ber;
@@ -199,7 +178,7 @@ void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->type = typeMap["SEQUENCE"].ber;
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["OBJECT IDENTIFIER"].ber;
-        std::vector<int> fullOid;
+        std::vector<long> fullOid;
         for (auto &n : tree.node.at(oidList.at(i)).oid) {
             fullOid.push_back(n);
         }
@@ -212,9 +191,7 @@ void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
     }
 
     si.assignBerTreeLength(si.berTreeInst);
-
 }
-
 
 bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
     int varbindCount = 0;
@@ -243,20 +220,20 @@ bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
             return false;
         }
 
-        std::vector<int> oid = di.getOidValue(varbind->sub.at(0)->content);
-        std::list<int> valueID;
+        std::vector<long> oid = di.getOidValue(varbind->sub.at(0)->content);
+        std::list<long> valueID;
         int oidIndex = -1;
         int valueIndex = -1;
 
         for (auto &p : oid) {
-            printf("oid %d ", p);
+            printf("oid %ld ", p);
         }
         while (oid.size() && (oidIndex < 0)) {
             oidIndex = tree.findNode(oid);
             printf("ind %d ", oidIndex);
             if (oidIndex < 0) {
                 valueID.push_front(oid.back());
-                printf("vl %d ", valueID.front());
+                printf("vl %ld ", valueID.front());
                 oid.pop_back();
             }
         }
@@ -275,8 +252,6 @@ bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
             return false;
         }
         valueList.push_back(valueIndex);
-
-
     }
     return true;
 }
@@ -293,14 +268,12 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
             errorValue = ERROR_GENERR;
             return false;
         }
-
         printf("Varbind check size %d\n", varbind->sub.size());
         if (varbind->sub.size() != 2) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
             return false;
         }
-
         printf("Varbind check OID type %02X\n", varbind->sub.at(0)->type);
         if (varbind->sub.at(0)->type != typeMap["OBJECT IDENTIFIER"].ber) {
             errorIndex = varbindCount;
@@ -308,8 +281,8 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
             return false;
         }
 
-        std::vector<int> oid = di.getOidValue(varbind->sub.at(0)->content);
-        std::list<int> valueID;
+        std::vector<long> oid = di.getOidValue(varbind->sub.at(0)->content);
+        std::list<long> valueID;
         int oidIndex = -1;
         int valueIndex = -1;
 
@@ -318,7 +291,7 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
             printf("ind %d ", oidIndex);
             if (oidIndex < 0) {
                 valueID.push_front(oid.back());
-                printf("vl %d ", valueID.front());
+                printf("vl %ld ", valueID.front());
                 oid.pop_back();
             }
         }
@@ -367,7 +340,7 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
             oidList.push_back(oidIndex);
             valueList.push_back(valueIndex+1);
         }
-
+        printf("OID LAST %ld VALUE LAST %ld\n", oidList.back(), valueList.back());
     }
     return true;
 }

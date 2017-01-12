@@ -4,20 +4,17 @@
 #include "defines.h"
 #include "BerTree.h"
 
-
 BerTree::BerTree() {
-    DEBUG("Constructor");
 }
 
 BerTree::~BerTree() {
-    DEBUG("Deconstructor");
 }
 
 void BerTree::print_tree(int n) {
     printf("BER TREE\n");
     if (!sub.empty()) {
         for (auto &node : sub) {
-            printf("%02d ", n);
+            printf("\t%02d ", n);
             printf("T: %02X ", (unsigned char)node->type);
             printf("L: ");
             for (auto &l : node->length) {
@@ -34,10 +31,6 @@ void BerTree::print_tree(int n) {
 }
 
 void BerTree::delete_tree() {
-    // for (std::vector<BerTree>::iterator it=sub.begin(); it<sub.end(); ++it) {
-    //     delete *it;
-    // }
-    printf("DELETE: SIZE B: %d\n", sub.size());
     for (auto &p : sub) {
         if (p->sub.empty()) {
             delete p;
@@ -46,5 +39,4 @@ void BerTree::delete_tree() {
         }
     }
     sub.clear();
-    printf("DELETE: SIZE A: %d\n", sub.size());
 }

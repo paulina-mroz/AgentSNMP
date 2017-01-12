@@ -13,7 +13,7 @@ Value::~Value(){
     DEBUG("Deconstructor\n");
 }
 
-bool Value::compareNode(std::list<int> const& ref) {
+bool Value::compareNode(std::list<long> const& ref) {
     bool isEqual = false;
     if ( ref.size() != id.size() ) {
         return isEqual;

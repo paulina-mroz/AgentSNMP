@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <list>
+
 #include "defines.h"
 #include "externs.h"
 #include "BerTree.h"
@@ -18,15 +19,12 @@ public:
 
     std::list<char> getLengthBer(long value);
     std::list<char> getIntBer(long value);
-    std::list<char> getOidBer(std::vector<int> &oid);
+    std::list<char> getOidBer(std::vector<long> &oid);
 
     void assignBerTreeLength(BerTree& bt);
-    void makeSerialData();
 
     BerTree berTreeInst;
     unsigned char berChar[RECVBUF_SIZE];
-
-
 };
 
 #endif /* SNMPSERIALIZER_H */

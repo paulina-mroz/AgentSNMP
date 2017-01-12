@@ -19,13 +19,7 @@ public:
     char type;
     std::list<char> length;
     std::list<char> content;
-
     std::vector<BerTree*> sub;
-
-
 };
-
-
-
 
 #endif /* BERTREE_H */

@@ -2,7 +2,6 @@
 #define AGENTCLASS_h
 
 #include "defines.h"
-// #include "Tree.h"
 #include "MIBParser.h"
 #include "SNMPServer.h"
 #include "PDUResponse.h"
@@ -19,7 +18,6 @@ public:
     void readContent();
     void makeContent();
 
-    // Tree treeInst;
     MIBParser parserInst;
     SNMPServer serverInst;
     SNMPDeserializer deserializerInst;
@@ -27,9 +25,7 @@ public:
     PDUResponse responseInst;
     MIBToolkit toolkitInst;
 
+    bool debug_print;
 };
-
-
-
 
 #endif /* AGENTCLASS_h */

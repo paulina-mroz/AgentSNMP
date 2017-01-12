@@ -16,19 +16,13 @@ public:
     std::vector<long> size;
     std::vector<long> range;
     struct enumInt {
-       int n;
+       long n;
        std::string s;
     };
     std::vector<enumInt> enumInts;
-    // std::map<int, std::string> enumInt;
-    // std::map<std::string, Type> table;
 
-    // std::string name;
     char ber;
     int storage;
 };
-
-
-
 
 #endif /* TYPE_H */

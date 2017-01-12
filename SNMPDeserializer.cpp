@@ -5,30 +5,13 @@
 #include "defines.h"
 
 SNMPDeserializer::SNMPDeserializer() {
-    DEBUG("Constructor\n");
-    error = 0;
 }
 
 SNMPDeserializer::~SNMPDeserializer() {
-    DEBUG("Deconstructor\n");
     berTreeInst.delete_tree();
 }
 
-// void SNMPDeserializer::getSerialData(unsigned char data[]) {
-// 	DEBUG("Sequence 0x%02x\n",data[0]);
-// 	if(data[0] != 0x30) {
-// 		perror("Not a sequence");
-// 		error = -1;
-// 	} else {
-// 		int sequenceLength = data[1];
-// 		DEBUG("Length 0x%02x\n",data[1]);
-// 	}
-// }
-
 bool SNMPDeserializer::checkRequest() {
-    berTreeInst.delete_tree();
-    makeBerTree();
-
     communityString.clear();
     requestID.clear();
 
@@ -63,7 +46,6 @@ bool SNMPDeserializer::checkCommunityString(BerTree &bt) {
     if (bt.type != typeMap["OCTET STRING"].ber) {
         return false;
     }
-
     communityString = std::string(bt.content.begin(), bt.content.end());
     return true;
 }
@@ -101,75 +83,13 @@ bool SNMPDeserializer::checkPDU(BerTree &bt) {
     return true;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void SNMPDeserializer::readContent(unsigned char data[], int length) {
-    berTreeInst.content.clear();
-    for (int i = 0; i < length; ++i) {
-        if (i % 16 == 0) {
-            printf("\n%04d: ", i);
-        }
-        printf("%02X ",data[i]);
-        berTreeInst.content.push_back(data[i]);
-    }
-    printf("\n");
-}
-
 void SNMPDeserializer::makeBerTree() {
-    // berTreeInst.sub.clear();
-    // berTreeInst.sub.push_back(BerTree());
-    // std::vector<BerTree>::iterator current = berTreeInst.sub.begin();
-    // std::list<char> cl = berTreeInst.content;
-    // printf("SEQUENCE %02X %02X\n",cl.front(),berTreeInst.sub.at(0).type);
-    // // (*current).type = 0xCD;
-    // while (!cl.empty()) {
-    //     for (auto &p : cl) {
-    //         printf("0x%02X ", (unsigned char)p);
-    //     }
-    //     printf("\n");
-    //
-    //     if (cl.front() == typeMap["SEQUENCE"].ber) {
-    //         current->type = cl.front();
-    //         printf("SEQUENCE %02X %02X\n",(unsigned char)cl.front(),berTreeInst.sub.at(0).type);
-    //
-    //     }
-    //     cl.pop_front();
-    // }
     addBerNode(berTreeInst);
-    berTreeInst.print_tree(0);
-    // printf("LENGTH TEST: %04X\n", (unsigned char)getLength(berTreeInst.sub.at(0).length));
 }
 
 void SNMPDeserializer::addBerNode(BerTree &bt) {
     std::list<char> cl = bt.content;
-
     while(!cl.empty()) {
-        // for (auto &p : cl) {
-        //     printf("0x%02X ", (unsigned char)p);
-        // }
-        // printf("\n");
         bt.sub.push_back(new BerTree());
         bt.sub.back()->type = cl.front();
         cl.pop_front();
@@ -186,20 +106,17 @@ void SNMPDeserializer::addBerNode(BerTree &bt) {
                         lengthLong = 256*lengthLong + (unsigned char)bt.sub.back()->length.back();
                     }
                 } else {
-                    // ERROR
                     return;
                 }
             } else {
                 lengthLong = bt.sub.back()->length.front();
             }
-            // printf("LENGTH %d %X\n",lengthLong, lengthLong);
             if (lengthLong <= cl.size()) {
                 for (long l = 0; l < lengthLong; ++l) {
                     bt.sub.back()->content.push_back(cl.front());
                     cl.pop_front();
                 }
             } else {
-                // ERROR
                 return;
             }
             bool isSequence = bt.sub.back()->type == typeMap["SEQUENCE"].ber;
@@ -213,20 +130,6 @@ void SNMPDeserializer::addBerNode(BerTree &bt) {
         }
     }
 }
-
-// long SNMPDeserializer::getLength(std::vector<char> berLength) {
-//     long result = 0;
-//     // if (berLength.front() & 0x80) {
-//     //     int lengthOfLength = berLength.front() & 0x7F;
-//     //         for (int i = 0; i < lengthOfLength; ++i) {
-//     //             result = 256*result + (unsigned char)(berLength.at(i+1));
-//     //         }
-//     // } else {
-//     //     result = berLength.front();
-//     // }
-//     return result;
-// }
-
 
 long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
     long result;
@@ -243,10 +146,10 @@ long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
     return result;
 }
 
-std::vector<int> SNMPDeserializer::getOidValue(std::list<char> &berOid) {
-    std::vector<int> oid;
+std::vector<long> SNMPDeserializer::getOidValue(std::list<char> &berOid) {
+    std::vector<long> oid;
     bool first = true;
-    int n = 0;
+    long n = 0;
     for (auto &i : berOid) {
         if (first) {
             oid.push_back(i/40);

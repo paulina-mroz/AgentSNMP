@@ -5,10 +5,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-// #include <sys/types.h>
-// #include <sys/socket.h>
-// #include <netinet/in.h>
-
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 
@@ -34,7 +30,6 @@ void *interactivePrint(void*) {
     pthread_exit(NULL);
 }
 
-
 int main(int argc, char **argv) {
     if (argc == 2) {
         if ((!strcmp(argv[1], "--help")) || (!strcmp(argv[1], "-h"))) {
@@ -51,11 +46,15 @@ int main(int argc, char **argv) {
             agentInst.parserInst.tree.print_tree();
         }
         if ((!strcmp(argv[1], "--interactive")) || (!strcmp(argv[1], "-i"))) {
+            agentInst.debug_print = true;
             int rc = pthread_create(&interactiveThread, NULL, interactivePrint, NULL);
             if (rc) {
                 printf("Error: unable to enter interactive mode :(\n");
                 exit(-1);
             }
+        }
+        if ((!strcmp(argv[1], "--debug")) || (!strcmp(argv[1], "-d"))) {
+            agentInst.debug_print = true;
         }
     } else if (argc == 3) {
         if ((!strcmp(argv[1], "--print_node_name")) || (!strcmp(argv[1], "-n"))) {
@@ -65,7 +64,7 @@ int main(int argc, char **argv) {
         if ((!strcmp(argv[1], "--print_node_oid")) || (!strcmp(argv[1], "-o"))) {
             std::string name(argv[2]);
             std::vector<std::string> v;
-            std::vector<int> v_int;
+            std::vector<long> v_int;
             boost::split_regex(v, name, boost::regex( "\\." ));
             for (auto &p : v) {
                 v_int.push_back(std::stoi(p));
@@ -74,22 +73,7 @@ int main(int argc, char **argv) {
         }
     }
 
-
-    // printf("seze of long: %d, int %d\n", sizeof(long), sizeof(int));
-    // std::list<char> testList;
-    // testList = agentInst.serializerInst.getIntBer((long)1<<32-1);
-    // for (auto &p : testList) {
-    //     printf("%02X ", (unsigned char) p);
-    // }
-    // printf("\n");
-    // testList = agentInst.serializerInst.getIntBer(-(long)(1<<32)+1);
-    // for (auto &p : testList) {
-    //     printf("%02X ", (unsigned char) p);
-    // }
-    // printf("\n");
-
     agentInst.flow();
-
     return 0;
 }
 
@@ -109,7 +93,7 @@ void printMenu(std::vector<std::string> commands) {
         if ((commands.at(0) == "print_node_oid") || (commands.at(0) == "o")) {
             std::string name = commands.at(1);
             std::vector<std::string> v;
-            std::vector<int> v_int;
+            std::vector<long> v_int;
             boost::split_regex(v, name, boost::regex( "\\." ));
             for (auto &p : v) {
                 v_int.push_back(std::stoi(p));
@@ -117,5 +101,4 @@ void printMenu(std::vector<std::string> commands) {
             agentInst.parserInst.tree.print_node(v_int);
         }
     }
-
 }

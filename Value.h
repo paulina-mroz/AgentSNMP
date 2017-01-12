@@ -12,15 +12,12 @@ public:
     Value();
     ~Value();
 
-    bool compareNode(std::list<int> const& ref);
+    bool compareNode(std::list<long> const& ref);
 
-    std::list<int> id;
+    std::list<long> id;
     std::string valueStr;
     long valueInt;
-    std::vector<int> valueOidIp;
+    std::vector<long> valueOidIp;
 };
-
-
-
 
 #endif /* VALUE_H */

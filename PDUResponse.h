@@ -12,13 +12,15 @@ class PDUResponse {
 public:
     PDUResponse();
     ~PDUResponse();
+
     void initPermissions(std::string fileName);
     bool getPermissions(std::string communityString, unsigned long menagerIP);
-    // void makeResponsePDU(BerTree &dbt, BerTree &sbt);
+
     void makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree &tree);
     void makeSkelPDU(SNMPSerializer &si);
     void makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si);
     void makeWrongValuePDU(SNMPSerializer &si, Tree &tree);
+
     bool checkOidExistence(SNMPDeserializer &di, Tree &tree);
     bool checkOidExistenceNext(SNMPDeserializer &di, Tree &tree);
     bool checkValueCorectness(Tree &tree);
@@ -42,8 +44,5 @@ public:
     std::vector<int> valueList;
 
 };
-
-
-
 
 #endif /* PDURESPONSE_H */
