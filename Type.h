@@ -25,6 +25,7 @@ public:
 
     // std::string name;
     char ber;
+    int storage;
 };
 
 

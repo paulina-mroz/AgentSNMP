@@ -51,6 +51,11 @@
 // genErr(5)
 // This is a catch-all error. If an error occurs for which none of the previous messages is appropriate, a genError is issued.
 
+#define STORAGE_NONE    0
+#define STORAGE_INT     1
+#define STORAGE_OID     2
+#define STORAGE_IP      3
+#define STORAGE_STR     4
 
 #endif /* DEFINES_H */
 

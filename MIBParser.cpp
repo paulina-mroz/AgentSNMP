@@ -51,19 +51,24 @@ void MIBParser::initPrimaryTypes() {
 
     typeMap["INTEGER"] = Type();
     typeMap["INTEGER"].ber = 0x02;
+    typeMap["INTEGER"].storage = STORAGE_INT;
     typeMap["OCTET STRING"] = Type();
     typeMap["OCTET STRING"].ber = 0x04;
+    typeMap["OCTET STRING"].storage = STORAGE_STR;
     typeMap["OBJECT IDENTIFIER"] = Type();
     typeMap["OBJECT IDENTIFIER"].ber = 0x06;
+    typeMap["OBJECT IDENTIFIER"].storage = STORAGE_OID;
     typeMap["NULL"] = Type();
     typeMap["NULL"].ber = 0x05;
 
     typeMap["DisplayString"] = Type();
-    typeMap["DisplayString"].ber = typeMap["OCTET STRING"].ber;
     typeMap["DisplayString"].primaryType = "OCTET STRING";
+    typeMap["DisplayString"].ber = typeMap[typeMap["DisplayString"].primaryType].ber;
+    typeMap["DisplayString"].storage = typeMap[typeMap["DisplayString"].primaryType].storage;
     typeMap["PhysAddress"] = Type();
-    typeMap["PhysAddress"].ber = typeMap["OCTET STRING"].ber;
     typeMap["PhysAddress"].primaryType = "OCTET STRING";
+    typeMap["PhysAddress"].ber = typeMap[typeMap["PhysAddress"].primaryType].ber;
+    typeMap["PhysAddress"].storage = typeMap[typeMap["PhysAddress"].primaryType].storage;
 
     // for (auto &p : typeMap) {
     //     std::cout << "INFO " << p.first << std::endl;
@@ -227,11 +232,12 @@ void MIBParser::handleObjectType(const std::string &block) {
         tree.node.at(tree.findNode(name)).status = match.str(5);
         tree.node.at(tree.findNode(name)).description = match.str(6);
 
-        tree.node.at(tree.findNode(name)).type.push_back(Type());
-        addType(tree.node.at(tree.findNode(name)).syntax, tree.node.at(tree.findNode(name)).type.back());
-        tree.node.at(tree.findNode(name)).type.back().ber = typeMap[tree.node.at(tree.findNode(name)).type.back().primaryType].ber;
+        // tree.node.at(tree.findNode(name)).type.push_back(Type());
+        addType(tree.node.at(tree.findNode(name)).syntax, tree.node.at(tree.findNode(name)).type);
+        tree.node.at(tree.findNode(name)).type.ber = typeMap[tree.node.at(tree.findNode(name)).type.primaryType].ber;
+        tree.node.at(tree.findNode(name)).type.storage = typeMap[tree.node.at(tree.findNode(name)).type.primaryType].storage;
         // std::cout << "INFO " << name << std::endl;
-        // tree.node.at(tree.findNode(name)).type.back().print_info();
+        // tree.node.at(tree.findNode(name)).type.print_info();
     }
 
 }
@@ -297,6 +303,7 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
         const std::string blockType = match.str(3);
         // typeMap[name] = Type();
         addType(blockType, typeMap[name]);
+        typeMap[name].storage = typeMap[typeMap[name].primaryType].storage;
         typeMap[name].ber = (1 << 6) | implicitNumber;
         // typeMap[name].primaryType = "A";
         // std::cout << "AAA: " << typeMap[name].primaryType << std::endl;
@@ -306,9 +313,11 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
         //
         // handleParentFromBraces(name,blockNodes);
     }
+    typeMap["IpAddress"].storage = STORAGE_IP;
     typeMap["NetworkAddress"] = Type();
-    typeMap["NetworkAddress"].ber = typeMap["IpAddress"].ber;
     typeMap["NetworkAddress"].primaryType = "IpAddress";
+    typeMap["NetworkAddress"].ber = typeMap[typeMap["NetworkAddress"].primaryType].ber;
+    typeMap["NetworkAddress"].storage = typeMap[typeMap["NetworkAddress"].primaryType].storage;
 }
 
 

@@ -32,7 +32,7 @@ public:
     std::string description;
     std::vector<std::string> index;
     // std::map<std::list<char>, std::string> value;
-    std::vector<Type> type;
+    Type type;
     std::vector<Value> value;
 };
 

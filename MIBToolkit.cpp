@@ -20,7 +20,7 @@ void MIBToolkit::setHardcodedValues(Tree &tree) {
     if (index > -1) {
         Value v;
         v.id.push_back(0);
-        v.value = "DESCRIPTION TesT";
+        v.valueStr = "DESCRIPTION TesT";
         tree.node.at(index).value.push_back(v);
     }
 
@@ -28,7 +28,7 @@ void MIBToolkit::setHardcodedValues(Tree &tree) {
     if (index > -1) {
         Value v;
         v.id.push_back(0);
-        v.value = "contact@example";
+        v.valueStr = "contact@example";
         tree.node.at(index).value.push_back(v);
         // tree.node.at(index).oid.back() = 4000;
     }
@@ -37,7 +37,7 @@ void MIBToolkit::setHardcodedValues(Tree &tree) {
     if (index > -1) {
         Value v;
         v.id.push_back(0);
-        v.value = "access changed for testing";
+        v.valueStr = "access changed for testing";
         tree.node.at(index).value.push_back(v);
         tree.node.at(index).access = "not-accessible";
     }

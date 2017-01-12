@@ -15,7 +15,9 @@ public:
     bool compareNode(std::list<int> const& ref);
 
     std::list<int> id;
-    std::string value;
+    std::string valueStr;
+    long valueInt;
+    std::vector<int> valueOidIp;
 };
 
 

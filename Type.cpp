@@ -9,6 +9,8 @@
 
 Type::Type() {
     DEBUG("Constructor");
+    ber = 0;
+    storage = STORAGE_NONE;
 }
 
 Type::~Type() {
@@ -17,11 +19,13 @@ Type::~Type() {
 
 void Type::print_info() {
     std::cout << "\tPrimary type: " << primaryType << std::endl;
+    std::cout << "\tStorage: " << storage << std::endl;
     std::cout << "\tBER: ";
     printf("%02X\n", (unsigned char) ber);
     std::cout << "\tSize: ";
     for (std::vector<long>::iterator it=size.begin(); it<size.end(); ++it) {
-        std::cout << *it << " - " << *(++it) << " ";
+        std::cout << *it << " - " << *(it+1) << " ";
+        ++it;
     }
     std::cout << std::endl;
     std::cout << "\tRange: ";

@@ -73,7 +73,15 @@ void Node::print_info() {
             for (auto &vid : v.id) {
                 printf("%d.", vid);
             }
-            std::cout << " " << v.value << std::endl;
+            if (type.storage == STORAGE_INT) {
+                std::cout << " " << v.valueInt << std::endl;
+            } else if (type.storage == STORAGE_STR) {
+                std::cout << " " << v.valueStr << std::endl;
+            } else if ((type.storage == STORAGE_OID) || (type.storage == STORAGE_IP)) {
+                for (auto &val : v.valueOidIp) {
+                    printf("%d.", val);
+                }
+            }
         }
     }
 }
