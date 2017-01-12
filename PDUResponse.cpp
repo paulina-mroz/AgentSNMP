@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <cstring>
 #include <iostream>
+#include <fstream>
+#include <regex>
+#include <boost/algorithm/string/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "PDUResponse.h"
 #include "defines.h"
@@ -13,19 +17,110 @@ PDUResponse::~PDUResponse(){
     DEBUG("Deconstructor\n");
 }
 
-bool PDUResponse::getPermissions(std::string communityString) {
+void PDUResponse::initPermissions(std::string fileName) {
+    std::ifstream myfile(fileName);
+    std::string line;
+    if(myfile.is_open()) {
+        while (std::getline(myfile,line)) {
+            std::string linePermission = line;
+            boost::trim(linePermission);
+
+            std::regex rgx("^[ ]*(r[wo]community)[ ]+([\\S]+)[ ]*([\\d]*)[\\.]*([\\d]*)[\\.]*([\\d]*)[\\.]*([\\d]*)[\\/]*([\\d]*)[ ]*$");
+            std::smatch match;
+
+            for(std::sregex_iterator i = std::sregex_iterator(linePermission.begin(), linePermission.end(), rgx); i != std::sregex_iterator(); ++i ) {
+                match = *i;
+                // for (unsigned i=0; i<match.size(); ++i)
+                //     std::cout << "match #" << i << ": " << match[i] << std::endl;
+
+                bool exist = false;
+                for (auto &p : permissions) {
+                    if (p.cs == match.str(2)) exist = true;
+                }
+
+                if (!exist) {
+                    permissionStruct ps;
+
+                    ps.cs = match.str(2);
+                    if (match.str(1) == "rocommunity") {
+                        ps.read = true;
+                        ps.write = false;
+                    } else if (match.str(1) == "rwcommunity") {
+                        ps.read = true;
+                        ps.write = true;
+                    }
+                    if ((match.str(3).empty()) || (match.str(4).empty()) || (match.str(5).empty()) || (match.str(6).empty())) {
+                        ps.ip = 0;
+                        ps.mask = 0;
+                    } else {
+                        ps.ip = 0;
+                        ps.ip = ps.ip | ((std::stoi(match.str(6)) & 0xFF) << 24);
+                        ps.ip = ps.ip | ((std::stoi(match.str(5)) & 0xFF) << 16);
+                        ps.ip = ps.ip | ((std::stoi(match.str(4)) & 0xFF) << 8);
+                        ps.ip = ps.ip | (std::stoi(match.str(3)) & 0xFF);
+                        if (match.str(7).empty()) {
+                            ps.mask = 0xFFFFFFFF;
+                        } else {
+                            int m = std::stoi(match.str(7));
+                            ps.mask = 0;
+                            if (m > 24) {
+                                ps.mask = ps.mask | (((1<<(m-24))-1) << 24);
+                                ps.mask = ps.mask | (0xFF << 16);
+                                ps.mask = ps.mask | (0xFF << 8);
+                                ps.mask = ps.mask | (0xFF);
+                            } else if (m > 16) {
+                                ps.mask = ps.mask | (((1<<(m-16))-1) << 16);
+                                ps.mask = ps.mask | (0xFF << 8);
+                                ps.mask = ps.mask | (0xFF);
+                            } else if (m > 8) {
+                                ps.mask = ps.mask | (((1<<(m-8))-1) << 8);
+                                ps.mask = ps.mask | (0xFF);
+                            } else if (m > 0) {
+                                ps.mask = ps.mask | ((1<<(m))-1);
+                            } else if (m <= 0) {
+                                ps.mask = 0xFFFFFFFF;
+                            }
+                        }
+                    }
+
+                    permissions.push_back(ps);
+                }
+            }
+
+        }
+        myfile.close();
+    }
+
+}
+
+
+bool PDUResponse::getPermissions(std::string communityString, unsigned long menagerIP) {
     permissionRead = false;
     permissionWrite = false;
 
-    if (communityString == "public") {
-        permissionRead = true;
-        return true;
+    for (auto &p : permissions) {
+        if (communityString == p.cs) {
+            if ((menagerIP & p.mask) == (p.ip & p.mask)) {
+                permissionRead = p.read;
+                permissionWrite = p.write;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+
     }
-    if (communityString == "private") {
-        permissionRead = true;
-        permissionWrite = true;
-        return true;
-    }
+
+    // if (communityString == "public") {
+    //     permissionRead = true;
+    //     return true;
+    // }
+    // if (communityString == "private") {
+    //     permissionRead = true;
+    //     permissionWrite = true;
+    //     return true;
+    // }
     return false;
 }
 

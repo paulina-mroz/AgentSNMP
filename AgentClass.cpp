@@ -15,8 +15,11 @@ AgentClass::~AgentClass(){
 
 void AgentClass::init() {
     std::string fileMIB = "mibs/RFC1213-MIB.txt";
+    std::string filePermissions = "data/community_string.conf";
+
     parserInst.parseFile(fileMIB);
     toolkitInst.setHardcodedValues(parserInst.tree);
+    responseInst.initPermissions(filePermissions);
 }
 void AgentClass::flow() {
     if (!serverInst.initConnection()) {
@@ -31,7 +34,7 @@ void AgentClass::flow() {
         if (!deserializerInst.checkRequest()) {
             printf("Wrong request :(\n");
         } else {
-            if (responseInst.getPermissions(deserializerInst.communityString)) {
+            if (responseInst.getPermissions(deserializerInst.communityString, serverInst.clientAddress.sin_addr.s_addr)) {
                 serializerInst.makeResponseSkel(deserializerInst.communityString);
                 // responseInst.makeResponsePDU(*deserializerInst.berTreeInst.sub.at(0)->sub.at(2),*serializerInst.berTreeInst.sub.at(0)->sub.at(2));
                 responseInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
