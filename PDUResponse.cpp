@@ -14,16 +14,16 @@ PDUResponse::~PDUResponse(){
 }
 
 bool PDUResponse::getPermissions(std::string communityString) {
-    permissionRO = false;
-    permissionRW = false;
+    permissionRead = false;
+    permissionWrite = false;
 
     if (communityString == "public") {
-        permissionRO = true;
+        permissionRead = true;
         return true;
     }
     if (communityString == "private") {
-        permissionRO = true;
-        permissionRW = true;
+        permissionRead = true;
+        permissionWrite = true;
         return true;
     }
     return false;
@@ -31,8 +31,8 @@ bool PDUResponse::getPermissions(std::string communityString) {
 
 void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree &tree) {
 // void PDUResponse::makeResponsePDU(BerTree &dbt, BerTree &sbt) {
-    bool oidCorrect = false;
-    char requestType = di.berTreeInst.sub.at(0)->sub.at(2)->type;
+    bool correct = false;
+    requestType = di.berTreeInst.sub.at(0)->sub.at(2)->type;
 
     requestID.clear();
     errorValue = ERROR_NOERROR;
@@ -43,15 +43,18 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
     requestID = di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(0)->content;
 
     makeSkelPDU(si);
-    oidCorrect = (requestType == typeMap["GETNEXTREQUEST"].ber) ? checkOidExistenceNext(di, tree) : checkOidExistence(di, tree);
-    if (!oidCorrect) {
+    correct = (requestType == typeMap["GETNEXTREQUEST"].ber) ? checkOidExistenceNext(di, tree) : checkOidExistence(di, tree);
+    if (!correct) {
             makeWrongOidPDU(di, si);
             return;
     }
     printf("Varbind OID correct :)\n");
-
-    // checkAccessibility(tree);
-
+    correct = checkValueCorectness(tree);
+    if (!correct) {
+            makeWrongValuePDU(si, tree);
+            return;
+    }
+    printf("Varbind value correct :)\n");
 }
 
 void PDUResponse::makeSkelPDU(SNMPSerializer &si) {
@@ -90,6 +93,31 @@ void PDUResponse::makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si) {
     }
 
     si.assignBerTreeLength(si.berTreeInst);
+}
+
+void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
+
+    for (int i = 0; i < oidList.size(); ++i) {
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.push_back(new BerTree());
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->type = typeMap["SEQUENCE"].ber;
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["OBJECT IDENTIFIER"].ber;
+        std::vector<int> fullOid;
+        for (auto &n : tree.node.at(oidList.at(i)).oid) {
+            fullOid.push_back(n);
+        }
+        for (auto &n : tree.node.at(oidList.at(i)).value.at(i).id) {
+            fullOid.push_back(n);
+        }
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = si.getOidBer(fullOid);
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["NULL"].ber;
+    }
+
+    si.assignBerTreeLength(si.berTreeInst);
+
 }
 
 
@@ -249,9 +277,29 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
     return true;
 }
 
-bool PDUResponse::checkAccessibility(Tree &tree) {
+bool PDUResponse::checkValueCorectness(Tree &tree) {
+    int varbindCount = 0;
     for (auto &p : oidList) {
-        // v_int.push_back(std::stoi(p));
+        varbindCount++;
+        if (tree.node.at(p).access == "not-accessible") {
+            errorValue = ERROR_NOSUCHNAME;
+            errorIndex = varbindCount;
+            return false;
+        }
+        if ((requestType == typeMap["GETREQUEST"].ber) || (requestType == typeMap["GETNEXTREQUEST"].ber)) {
+            if ((tree.node.at(p).access == "write-only") || (!permissionRead)) {
+                errorValue = ERROR_NOSUCHNAME;
+                errorIndex = varbindCount;
+                return false;
+            }
+        }
+        if (requestType == typeMap["SETREQUEST"].ber) {
+            if ((tree.node.at(p).access == "read-only") || (!permissionWrite)) {
+                errorValue = ERROR_NOSUCHNAME;
+                errorIndex = varbindCount;
+                return false;
+            }
+        }
     }
     return true;
 }

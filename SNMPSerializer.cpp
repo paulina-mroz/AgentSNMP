@@ -78,6 +78,34 @@ std::list<char> SNMPSerializer::getIntBer(long value) {
     return intList;
 }
 
+std::list<char> SNMPSerializer::getOidBer(std::vector<int> &oid) {
+    std::list<char> oidList;
+    int count = 1;
+    for (auto &i : oid) {
+        if (count == 1) {
+            oidList.push_back(i);
+            count++;
+        } else if (count == 2) {
+            oidList.back() = oidList.back()*40 + i;
+            count++;
+        } else {
+            std::list<char> oidSubList;
+            int n = i;
+            oidSubList.push_front(n & 0x7F);
+            n = n >> 7;
+            while (n > 0) {
+                oidSubList.push_front((n & 0x7F) | 0x80);
+                n = n >> 7;
+            }
+            for (auto &subi : oidSubList) {
+                oidList.push_back(subi);
+            }
+        }
+    }
+    return oidList;
+}
+
+
 void SNMPSerializer::makeResponseSkel(std::string communityString) {
     berTreeInst.content.clear();
     berTreeInst.delete_tree();

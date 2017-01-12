@@ -18,6 +18,8 @@ public:
 
     std::list<char> getLengthBer(long value);
     std::list<char> getIntBer(long value);
+    std::list<char> getOidBer(std::vector<int> &oid);
+
     void assignBerTreeLength(BerTree& bt);
     void makeSerialData();
 
