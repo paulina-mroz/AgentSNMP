@@ -119,7 +119,23 @@ void MIBParser::parseFile(std::string fileName) {
     handleImports(content);
     handleObjectID(content);
     handleObjectType(content);
+    setIndexIndex();
 }
+
+void MIBParser::setIndexIndex() {
+    for (auto &n : tree.node) {
+        n.indexIndex.clear();
+        if (!n.index.empty()) {
+            for (auto &ind : n.index) {
+                int nodeIndex = tree.findNode(ind);
+                if (nodeIndex >= 0) {
+                    n.indexIndex.push_back(tree.node.at(nodeIndex).oid.back());
+                }
+            }
+        }
+    }
+}
+
 
 void MIBParser::handleImports(const std::string &block) {
     std::regex rgx("IMPORTS[\\s]*[^;]*");

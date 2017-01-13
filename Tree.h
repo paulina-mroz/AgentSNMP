@@ -17,6 +17,7 @@ public:
     bool compareNode(std::vector<long> const& ref);
     int findValue(std::list<long> const& ref);
     int findChild(long ref);
+    int findNextChild(long ref);
     void print_info();
 
     std::vector<long> oid;
@@ -30,8 +31,10 @@ public:
     std::string description;
     std::vector<std::string> index;
 
+
     Type type;
     std::vector<Value> value;
+    std::vector<long> indexIndex;
 };
 
 class Tree {

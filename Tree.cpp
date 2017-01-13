@@ -49,6 +49,16 @@ int Node::findChild(long ref) {
     return -1;
 }
 
+int Node::findNextChild(long ref) {
+    for (int i = 0; i < child.size(); ++i) {
+        if (child.at(i) > ref) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
 void Node::print_info() {
     std::cout << "NAME\n\t" << name << std::endl;
     std::cout << "OID\n\t";
@@ -70,6 +80,11 @@ void Node::print_info() {
             std::cout << "\n\t" << v;
         }
         std::cout << std::endl;
+        // std::cout << "\t(";
+        // for (auto &v : indexIndex) {
+        //     std::cout << ", " << v;
+        // }
+        // std::cout << ")" << std::endl;
     }
     if (!value.empty()) {
         std::cout << "VALUES\n\t";
@@ -157,15 +172,22 @@ void Tree::print_tree() {
                 }
             }
             print_vector(id);
+            // std::cout << " " << node.at(ind).name << std::endl;
+            if (!node.at(ind).value.empty()) {
+                printf(" [%d]", node.at(ind).value.size());
+            }
             std::cout << " " << node.at(ind).name << std::endl;
-            level.at(sizeID-1)--;
         }
+        level.at(sizeID-1)--;
     }
 }
 
 void Tree::print_node(std::string const& name) {
     std::cout << "INFO about: " << name << std::endl;
-    if (findNode(name) < 0) return;
+    if (findNode(name) < 0) {
+        std::cout << "Does not exist :(" << std::endl;
+        return;
+    }
     node.at(findNode(name)).print_info();
 }
 
@@ -173,7 +195,10 @@ void Tree::print_node(std::vector<long> const& name) {
     std::cout << "INFO about: ";
     print_vector(name);
     std::cout << std::endl;
-    if (findNode(name) < 0) return;
+    if (findNode(name) < 0) {
+        std::cout << "Does not exist :(" << std::endl;
+        return;
+    }
     node.at(findNode(name)).print_info();
 }
 

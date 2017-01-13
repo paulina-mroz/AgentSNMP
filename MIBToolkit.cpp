@@ -30,7 +30,11 @@ void MIBToolkit::setHardcodedValues(Tree &tree) {
         v.id.push_back(0);
         v.valueStr = "contact@example";
         tree.node.at(index).value.push_back(v);
-        // tree.node.at(index).oid.back() = 4000;
+        Value v2;
+        v2.id.push_back(2);
+        v2.valueStr = "contact@example";
+        tree.node.at(index).value.push_back(v2);
+        tree.node.at(index).oid.back() = 4000;
     }
 
     index = tree.findNode("sysName");
@@ -41,4 +45,9 @@ void MIBToolkit::setHardcodedValues(Tree &tree) {
         tree.node.at(index).value.push_back(v);
         tree.node.at(index).access = "not-accessible";
     }
+
+}
+
+void MIBToolkit::setHardcodedTable(Tree &tree) {
+
 }

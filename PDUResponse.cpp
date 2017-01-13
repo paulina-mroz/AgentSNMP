@@ -125,7 +125,22 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
             return;
     }
     printf("Varbind OID correct :)\n");
-    correct = checkValueCorectness(tree);
+    int varbindCount = 0;
+    for (auto &p : oidList) {
+        varbindCount++;
+        printf("OID %d: ", p);
+        for (auto &o : tree.node.at(p).oid) {
+            printf("%ld.", o);
+        }
+        printf("\n");
+        long val = valueList.at(varbindCount-1);
+        printf("Value %d: ", val);
+        for (auto &o : tree.node.at(p).value.at(val).id) {
+            printf("%ld.", o);
+        }
+        printf("\n");
+    }
+    correct = checkValueCorectness(*di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3), tree);
     if (!correct) {
             makeWrongValuePDU(si, tree);
             return;
@@ -182,7 +197,7 @@ void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
         for (auto &n : tree.node.at(oidList.at(i)).oid) {
             fullOid.push_back(n);
         }
-        for (auto &n : tree.node.at(oidList.at(i)).value.at(i).id) {
+        for (auto &n : tree.node.at(oidList.at(i)).value.at(valueList.at(i)).id) {
             fullOid.push_back(n);
         }
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = si.getOidBer(fullOid);
@@ -196,24 +211,24 @@ void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
 bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
     int varbindCount = 0;
     for (auto &varbind : di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub) {
-        printf("VARBIND\n");
+        // printf("VARBIND\n");
         varbindCount++;
 
-        printf("Varbind check type %02X\n", varbind->type);
+        // printf("Varbind check type %02X\n", varbind->type);
         if (varbind->type != typeMap["SEQUENCE"].ber) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
             return false;
         }
 
-        printf("Varbind check size %d\n", varbind->sub.size());
+        // printf("Varbind check size %d\n", varbind->sub.size());
         if (varbind->sub.size() != 2) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
             return false;
         }
 
-        printf("Varbind check OID type %02X\n", varbind->sub.at(0)->type);
+        // printf("Varbind check OID type %02X\n", varbind->sub.at(0)->type);
         if (varbind->sub.at(0)->type != typeMap["OBJECT IDENTIFIER"].ber) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
@@ -225,32 +240,43 @@ bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
         int oidIndex = -1;
         int valueIndex = -1;
 
-        for (auto &p : oid) {
-            printf("oid %ld ", p);
-        }
+        // printf("OID address ");
+        // for (auto &p : oid) {
+            // printf("%ld ", p);
+        // }
+        // printf("\n");
+
         while (oid.size() && (oidIndex < 0)) {
             oidIndex = tree.findNode(oid);
-            printf("ind %d ", oidIndex);
+            // printf("ind %d ", oidIndex);
             if (oidIndex < 0) {
                 valueID.push_front(oid.back());
-                printf("vl %ld ", valueID.front());
+                // printf("vl %ld ", valueID.front());
                 oid.pop_back();
             }
         }
-        printf("Varbind OID index %d\n", oidIndex);
+        // printf("\nOID index %d: ", oidIndex);
         if (oidIndex < 0) {
             errorIndex = varbindCount;
             errorValue = ERROR_NOSUCHNAME;
             return false;
         }
-        oidList.push_back(oidIndex);
+        // for (auto &p : tree.node.at(oidIndex).oid) {
+            // printf("%ld ", p);
+        // }
+        // printf("\n");
         valueIndex = tree.node.at(oidIndex).findValue(valueID);
-        printf("Varbind value index %d\n", valueIndex);
+        // printf("Varbind value index %d: ", valueIndex);
         if (valueIndex < 0) {
             errorIndex = varbindCount;
             errorValue = ERROR_NOSUCHNAME;
             return false;
         }
+        // for (auto &p : tree.node.at(oidIndex).value.at(valueIndex).id) {
+            // printf("%ld ", p);
+        // }
+        // printf("\n");
+        oidList.push_back(oidIndex);
         valueList.push_back(valueIndex);
     }
     return true;
@@ -259,22 +285,22 @@ bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
 bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
     int varbindCount = 0;
     for (auto &varbind : di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub) {
-        printf("VARBIND NEXT\n");
+        // printf("VARBIND NEXT\n");
         varbindCount++;
 
-        printf("Varbind check type %02X\n", varbind->type);
+        // printf("Varbind check type %02X\n", varbind->type);
         if (varbind->type != typeMap["SEQUENCE"].ber) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
             return false;
         }
-        printf("Varbind check size %d\n", varbind->sub.size());
+        // printf("Varbind check size %d\n", varbind->sub.size());
         if (varbind->sub.size() != 2) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
             return false;
         }
-        printf("Varbind check OID type %02X\n", varbind->sub.at(0)->type);
+        // printf("Varbind check OID type %02X\n", varbind->sub.at(0)->type);
         if (varbind->sub.at(0)->type != typeMap["OBJECT IDENTIFIER"].ber) {
             errorIndex = varbindCount;
             errorValue = ERROR_GENERR;
@@ -285,67 +311,145 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
         std::list<long> valueID;
         int oidIndex = -1;
         int valueIndex = -1;
+        long childNumber = -1;
+        bool found = false;
+
+        // printf("OID address ");
+        // for (auto &p : oid) {
+            // printf("%ld ", p);
+        // }
+        // printf("\n");
 
         while (oid.size() && (oidIndex < 0)) {
             oidIndex = tree.findNode(oid);
-            printf("ind %d ", oidIndex);
+            // printf("ind %d ", oidIndex);
             if (oidIndex < 0) {
+                childNumber = oid.back();
                 valueID.push_front(oid.back());
-                printf("vl %ld ", valueID.front());
+                // printf("vl %ld ", valueID.front());
                 oid.pop_back();
             }
         }
+        // printf("\nOID index %d: ", oidIndex);
         if (oidIndex < 0) {
-            errorIndex = varbindCount;
-            errorValue = ERROR_NOSUCHNAME;
-            return false;
-        }
-        valueIndex = tree.node.at(oidIndex).findValue(valueID);
-        if ((valueIndex < 0) || (tree.node.at(oidIndex).value.size() < (valueIndex+2))) {
-            int nextIndex = -1;
-            while ((oid.size() > 1) && (nextIndex < 0)) {
-                int childNumber = oid.back();
-                oid.pop_back();
-                int parentIndex = tree.findNode(oid);
-                int childIndex = tree.node.at(parentIndex).findChild(childNumber);
-                if (tree.node.at(parentIndex).child.size() > (childIndex+1)) {
-                    nextIndex = childIndex + 1;
-                    oid.push_back(nextIndex);
-                }
-                printf("FFFFFFF %d %d FFFFFFFFF\n", childNumber, childIndex);
-            }
-            if (nextIndex < 0) {
+            if (valueID.front() > tree.root.back()) {
+                // printf("NONE :(\n");
                 errorIndex = varbindCount;
                 errorValue = ERROR_NOSUCHNAME;
                 return false;
             }
-
-            int childNodeIndex = tree.findNode(oid);
-            int childSize = tree.node.at(childNodeIndex).child.size();
-            while (childSize != 0) {
-                oid.push_back(tree.node.at(childNodeIndex).child.at(0));
-                childNodeIndex = tree.findNode(oid);
-                childSize = tree.node.at(childNodeIndex).child.size();
-            }
-
-            oidList.push_back(childNodeIndex);
-            if (tree.node.at(childNodeIndex).value.size() == 0) {
-                errorIndex = varbindCount;
-                errorValue = ERROR_NOSUCHNAME;
-                return false;
-            }
-            valueList.push_back(0);
-
+            oid = tree.root;
+            oidIndex = tree.findNode(oid);
+            childNumber = -1;
         } else {
-            oidList.push_back(oidIndex);
-            valueList.push_back(valueIndex+1);
+            if ((!tree.node.at(oidIndex).value.empty()) && (!valueID.empty())) {
+                valueIndex = tree.node.at(oidIndex).findValue(valueID);
+                // printf("Varbind value index %d: ", valueIndex);
+
+                if ((valueIndex < 0) || (tree.node.at(oidIndex).value.size() < (valueIndex+2))) {
+                    childNumber = oid.back();
+                    oid.pop_back();
+                    oidIndex = tree.findNode(oid);
+                } else {
+                    // for (auto &p : tree.node.at(oidIndex).value.at(valueIndex+1).id) {
+                        // printf("%ld ", p);
+                    // }
+                    // printf("\n");
+                    // printf("FOUND :)\n");
+                    oidList.push_back(oidIndex);
+                    valueList.push_back(valueIndex+1);
+                    found = true;
+
+                    // printf("OID LAST %ld: ", oidList.back());
+                    // for (auto &p : tree.node.at(oidList.back()).oid) {
+                        // printf("%ld ", p);
+                    // }
+                    // printf("\n");
+                    // printf("VALUE LAST %ld: ", valueList.back());
+                    // for (auto &p : tree.node.at(oidList.back()).value.at(valueList.back()).id) {
+                        // printf("%ld ", p);
+                    // }
+                    // printf("\n");
+                }
+            }
         }
-        printf("OID LAST %ld VALUE LAST %ld\n", oidList.back(), valueList.back());
+
+        if (!found) {
+            while ((!found) && (oid.size()>0)) {
+                // printf("Looking...\n");
+                // printf("OID current %d: ", oidIndex);
+                // for (auto &p : oid) {
+                    // printf("%ld ", p);
+                // }
+                // printf("\n Child %d\n", childNumber);
+                if (tree.node.at(oidIndex).child.empty()) {
+                    // printf("Lack of children\n");
+                    if (tree.node.at(oidIndex).value.empty()) {
+                        // printf("Lack of values\n");
+                        childNumber = oid.back();
+                        oid.pop_back();
+                        oidIndex = tree.findNode(oid);
+                        // printf("New OID\n");
+                        // printf("OID new %d: ", oidIndex);
+                        // for (auto &p : oid) {
+                            // printf("%ld ", p);
+                        // }
+                        // printf("\n Child %d\n", childNumber);
+
+                    } else {
+                        // printf("FOUND 2 :)\n");
+                        valueIndex = 0;
+                        found = true;
+                    }
+                } else {
+                    int nextChildNumber = tree.node.at(oidIndex).findNextChild(childNumber);
+                    // printf("\n Children present, next %d\n", nextChildNumber);
+                    if (nextChildNumber < 0) {
+                        childNumber = oid.back();
+                        oid.pop_back();
+                        oidIndex = tree.findNode(oid);
+                    } else {
+                        childNumber = -1;
+                        oid.push_back(tree.node.at(oidIndex).child.at(nextChildNumber));
+                        oidIndex = tree.findNode(oid);
+                    }
+                    // printf("New OID\n");
+                    // printf("OID new %d: ", oidIndex);
+                    // for (auto &p : oid) {
+                        // printf("%ld ", p);
+                    // }
+                    // printf("\n Child %d\n", childNumber);
+                }
+            }
+
+            if (found) {
+                // printf("FOUND 3 :)\n");
+                oidList.push_back(oidIndex);
+                valueList.push_back(valueIndex);
+
+                // printf("OID LAST %ld: ", oidList.back());
+                // for (auto &p : tree.node.at(oidList.back()).oid) {
+                    // printf("%ld ", p);
+                // }
+                // printf("\n");
+                // printf("VALUE LAST %ld: ", valueList.back());
+                // for (auto &p : tree.node.at(oidList.back()).value.at(valueList.back()).id) {
+                    // printf("%ld ", p);
+                // }
+                // printf("\n");
+            } else {
+                // printf("NONE :(\n");
+                errorIndex = varbindCount;
+                errorValue = ERROR_NOSUCHNAME;
+                return false;
+            }
+        }
     }
     return true;
 }
 
-bool PDUResponse::checkValueCorectness(Tree &tree) {
+bool PDUResponse::checkValueCorectness(BerTree &bt, Tree &tree) {
+    int i = 0;
     int varbindCount = 0;
     for (auto &p : oidList) {
         varbindCount++;
@@ -367,7 +471,18 @@ bool PDUResponse::checkValueCorectness(Tree &tree) {
                 errorIndex = varbindCount;
                 return false;
             }
+
+            // printf("Check ber %d %02X %02X\n",bt.sub.size(), (unsigned char)tree.node.at(p).type.ber, (unsigned char)bt.sub.at(i)->sub.at(1)->type);
+            if (bt.sub.at(i)->sub.at(1)->type != tree.node.at(p).type.ber) {
+                errorValue = ERROR_BADVALUE;
+                errorIndex = varbindCount;
+                return false;
+            }
+
+
+
         }
+        i++;
     }
     return true;
 }

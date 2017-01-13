@@ -14,6 +14,7 @@ public:
     ~MIBToolkit();
 
     void setHardcodedValues(Tree &tree);
+    void setHardcodedTable(Tree &tree);
 };
 
 #endif /* MIBTOOLKIT_H */

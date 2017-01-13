@@ -23,7 +23,7 @@ public:
 
     bool checkOidExistence(SNMPDeserializer &di, Tree &tree);
     bool checkOidExistenceNext(SNMPDeserializer &di, Tree &tree);
-    bool checkValueCorectness(Tree &tree);
+    bool checkValueCorectness(BerTree &bt, Tree &tree);
 
     struct permissionStruct {
         std::string cs;

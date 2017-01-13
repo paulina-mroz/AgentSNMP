@@ -142,7 +142,7 @@ long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
             result = 256*result + (unsigned char)p;
         }
     }
-    printf("getInt %d\n", result);
+    // printf("getInt %d\n", result);
     return result;
 }
 
