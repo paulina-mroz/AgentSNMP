@@ -22,6 +22,8 @@ public:
 
     long getIntValue(std::list<char> &berInt);
     std::vector<long> getOidValue(std::list<char> &berOid);
+    std::vector<long> getIpValue(std::list<char> &berIp);
+    std::string getStrValue(std::list<char> &berStr);
 
     BerTree berTreeInst;
     std::string communityString;

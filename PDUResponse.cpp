@@ -150,8 +150,10 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
     printf("Varbind value correct :)\n");
     if (requestType == typeMap["SETREQUEST"].ber) {
         printf("SET HANDLING :)\n");
-        // SET HANDLING
+        saveValuesToTree(tree);
+        // toolkitInst.saveValuesToFile(tree);
     }
+    // toolkitInst.updateValuesFromFile(tree);
     correct = makeGetPDU(si, tree);
     if (!correct) {
         makeErrorPDU(si, tree);
@@ -238,8 +240,6 @@ void PDUResponse::makeWrongSetPDU(SNMPSerializer &si, Tree &tree) {
 }
 
 bool PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
-    toolkitInst.updateValuesFromFile(tree);
-
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
 
@@ -571,27 +571,123 @@ bool PDUResponse::checkValueCorectness(SNMPDeserializer &di, Tree &tree) {
             printf("TYPE VALID :)\n");
 
             Value v;
+            int storage = tree.node.at(p).type.storage;
 
+            if (storage == STORAGE_INT) {
+                v.valueInt = di.getIntValue(di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.at(i)->sub.at(1)->content);
+            } else if (storage == STORAGE_IP) {
+                v.valueOidIp = di.getIpValue(di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.at(i)->sub.at(1)->content);
+            } else if (storage == STORAGE_OID) {
+                v.valueOidIp = di.getOidValue(di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.at(i)->sub.at(1)->content);
+            } else if (storage == STORAGE_STR) {
+                v.valueStr = di.getStrValue(di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.at(i)->sub.at(1)->content);
+            }
+
+
+            std::cout << "VALUE\n";
+            std::cout << "\t";
+            if (storage == STORAGE_INT) {
+                std::cout << " " << v.valueInt << std::endl;
+            } else if (storage == STORAGE_STR) {
+                std::cout << " " << v.valueStr << std::endl;
+            } else if ((storage == STORAGE_OID) || (storage == STORAGE_IP)) {
+                std::cout << " ";
+                for (auto &val : v.valueOidIp) {
+                    printf("%ld.", val);
+                }
+                std::cout << std::endl;
+            }
 
             bool correct = false;
-            // correct = checkSetSize();
+            std::string prim = "";
+            correct = checkSetSize(tree.node.at(p).type, v);
+            prim = tree.node.at(p).type.primaryType;
+            while ((!prim.empty()) && correct) {
+                std::cout << "Checking size of " << prim << std::endl;
+                correct = checkSetSize(typeMap[prim], v);
+                prim = typeMap[prim].primaryType;
+            }
             if (!correct) {
                 errorValue = ERROR_BADVALUE;
                 errorIndex = varbindCount;
                 return false;
             }
             printf("SIZE VALID :)\n");
-            // correct = checkSetRange();
+
+            correct = checkSetRange(tree.node.at(p).type, v);
+            prim = tree.node.at(p).type.primaryType;
+            while ((!prim.empty()) && correct) {
+                std::cout << "Checking range of " << prim << std::endl;
+                correct = checkSetRange(typeMap[prim], v);
+                prim = typeMap[prim].primaryType;
+            }
             if (!correct) {
                 errorValue = ERROR_BADVALUE;
                 errorIndex = varbindCount;
                 return false;
             }
             printf("RANGE VALID :)\n");
-
+            valueValues.push_back(v);
 
         }
         i++;
     }
     return true;
+}
+
+bool PDUResponse::checkSetSize(Type &type, Value &v) {
+    printf("checkSetSize %d\n", type.size.size());
+    if (type.size.empty()) return true;
+
+    long size = 0;
+    if (type.storage == STORAGE_INT) {
+        size = 1;
+    } else if ((type.storage == STORAGE_OID) || (type.storage == STORAGE_IP)) {
+        size = v.valueOidIp.size();
+    } else if (type.storage == STORAGE_STR) {
+        size = v.valueStr.size();
+    }
+    printf("current Size %d\n", size);
+
+    if ((size >= type.size.at(0)) && (size <= type.size.at(1))) return true;
+
+    return false;
+}
+
+bool PDUResponse::checkSetRange(Type &type, Value &v) {
+    printf("checkSetRange %d %d\n", type.range.size(), type.enumInts.size());
+    if ((type.range.empty()) && (type.enumInts.empty())) return true;
+
+    long range = 0;
+    if (type.storage == STORAGE_INT) {
+        range = v.valueInt;
+    } else {
+        return true;
+    }
+    printf("current range %d\n", range);
+
+    if (!type.range.empty()) {
+        if ((range >= type.range.at(0)) && (range <= type.range.at(1))) return true;
+    }
+    if (!type.enumInts.empty()) {
+        for (auto &ei : type.enumInts) {
+            if (ei.n == range) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void PDUResponse::saveValuesToTree(Tree &tree) {
+    printf("Save sizes %d %d %d\n", oidList.size(), valueList.size(), valueValues.size());
+    int i = 0;
+    for (auto &p : oidList) {
+        tree.node.at(p).value.at(valueList.at(i)).valueInt = valueValues.at(i).valueInt;
+        tree.node.at(p).value.at(valueList.at(i)).valueOidIp = valueValues.at(i).valueOidIp;
+        tree.node.at(p).value.at(valueList.at(i)).valueStr = valueValues.at(i).valueStr;
+
+        i++;
+    }
 }

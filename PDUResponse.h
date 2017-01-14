@@ -8,6 +8,7 @@
 #include "SNMPSerializer.h"
 #include "MIBToolkit.h"
 #include "Tree.h"
+#include "Type.h"
 #include "Value.h"
 
 class PDUResponse {
@@ -28,6 +29,12 @@ public:
     bool checkOidExistence(SNMPDeserializer &di, Tree &tree);
     bool checkOidExistenceNext(SNMPDeserializer &di, Tree &tree);
     bool checkValueCorectness(SNMPDeserializer &di, Tree &tree);
+
+    bool checkSetSize(Type &type, Value &v);
+    bool checkSetRange(Type &type, Value &v);
+
+    void saveValuesToTree(Tree &tree);
+
 
     MIBToolkit toolkitInst;
 

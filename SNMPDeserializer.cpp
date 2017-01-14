@@ -167,3 +167,19 @@ std::vector<long> SNMPDeserializer::getOidValue(std::list<char> &berOid) {
     }
     return oid;
 }
+
+std::vector<long> SNMPDeserializer::getIpValue(std::list<char> &berIp) {
+    std::vector<long> ip;
+    for (auto &i : berIp) {
+        ip.push_back(i);
+    }
+    return ip;
+}
+
+std::string SNMPDeserializer::getStrValue(std::list<char> &berStr) {
+    std::string str;
+    for (auto &i : berStr) {
+        str.push_back(i);
+    }
+    return str;
+}

@@ -50,6 +50,15 @@ void MIBToolkit::setHardcodedValues(Tree &tree) {
         tree.node.at(index).access = "not-accessible";
     }
 
+    index = tree.findNode("sysServices");
+    if (index > -1) {
+        Value v;
+        v.id.push_back(0);
+        v.valueInt = 5;
+        tree.node.at(index).value.push_back(v);
+        tree.node.at(index).access = "read-write";
+        tree.node.at(index).oid.back() = 4001;
+    }
 }
 
 void MIBToolkit::setHardcodedTable(Tree &tree) {
