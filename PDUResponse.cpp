@@ -115,6 +115,7 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
     errorIndex = 0;
     oidList.clear();
     valueList.clear();
+    valueValues.clear();
 
     requestID = di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(0)->content;
 
@@ -140,17 +141,22 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
         }
         printf("\n");
     }
-    correct = checkValueCorectness(*di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3), tree);
+    maxCount = oidList.size();
+    correct = checkValueCorectness(di, tree);
     if (!correct) {
-            makeWrongValuePDU(si, tree);
-            return;
+        makeErrorPDU(si, tree);
+        return;
     }
     printf("Varbind value correct :)\n");
     if (requestType == typeMap["SETREQUEST"].ber) {
+        printf("SET HANDLING :)\n");
         // SET HANDLING
     }
-    makeGetPDU(si, tree);
-
+    correct = makeGetPDU(si, tree);
+    if (!correct) {
+        makeErrorPDU(si, tree);
+        return;
+    }
 }
 
 void PDUResponse::makeSkelPDU(SNMPSerializer &si) {
@@ -173,8 +179,12 @@ void PDUResponse::makeSkelPDU(SNMPSerializer &si) {
 }
 
 void PDUResponse::makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si) {
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.clear();
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.clear();
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
+
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->delete_tree();
 
     for (auto &varbind : di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.push_back(new BerTree());
@@ -185,15 +195,19 @@ void PDUResponse::makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["NULL"].ber;
     }
-
     si.assignBerTreeLength(si.berTreeInst);
 }
 
-void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
+void PDUResponse::makeErrorPDU(SNMPSerializer &si, Tree &tree) {
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.clear();
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.clear();
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
 
-    for (int i = 0; i < oidList.size(); ++i) {
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->delete_tree();
+
+    // int oidMaxCount = (errorValue == ERROR_TOOBIG) ? (errorIndex) : oidList.size();
+    for (int i = 0; i < maxCount; ++i) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.push_back(new BerTree());
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->type = typeMap["SEQUENCE"].ber;
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
@@ -208,15 +222,22 @@ void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = si.getOidBer(fullOid);
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["NULL"].ber;
+
+        si.assignBerTreeLength(si.berTreeInst);
+        if (si.berTreeInst.content.size() > SENDBUF_SIZE) {
+            errorValue = ERROR_TOOBIG;
+            errorIndex = i+1;
+            maxCount = i;
+            makeErrorPDU(si, tree);
+        }
     }
 
-    si.assignBerTreeLength(si.berTreeInst);
 }
 
 void PDUResponse::makeWrongSetPDU(SNMPSerializer &si, Tree &tree) {
 }
 
-void PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
+bool PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
     toolkitInst.updateValuesFromFile(tree);
 
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
@@ -257,12 +278,19 @@ void PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
             si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = valueBer;
         }
 
-
+        si.assignBerTreeLength(si.berTreeInst);
+        if (si.berTreeInst.content.size() > SENDBUF_SIZE) {
+            printf("TOO BIG %ld\n", si.berTreeInst.content.size());
+            errorValue = ERROR_TOOBIG;
+            errorIndex = i+1;
+            maxCount = i+1;
+            return false;
+        }
 
 
     }
 
-    si.assignBerTreeLength(si.berTreeInst);
+    return true;
 }
 
 
@@ -506,7 +534,8 @@ bool PDUResponse::checkOidExistenceNext(SNMPDeserializer &di, Tree &tree) {
     return true;
 }
 
-bool PDUResponse::checkValueCorectness(BerTree &bt, Tree &tree) {
+bool PDUResponse::checkValueCorectness(SNMPDeserializer &di, Tree &tree) {
+    printf("VALUES CORRECTNESS CHECK :)\n");
     int i = 0;
     int varbindCount = 0;
     for (auto &p : oidList) {
@@ -524,19 +553,41 @@ bool PDUResponse::checkValueCorectness(BerTree &bt, Tree &tree) {
             }
         }
         if (requestType == typeMap["SETREQUEST"].ber) {
+            printf("SET CHECK :)\n");
             if ((tree.node.at(p).access == "read-only") || (!permissionWrite)) {
+                printf("READ ONLY :(\n");
                 errorValue = ERROR_NOSUCHNAME;
                 errorIndex = varbindCount;
                 return false;
             }
 
-            // printf("Check ber %d %02X %02X\n",bt.sub.size(), (unsigned char)tree.node.at(p).type.ber, (unsigned char)bt.sub.at(i)->sub.at(1)->type);
-            if (bt.sub.at(i)->sub.at(1)->type != tree.node.at(p).type.ber) {
+            // di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)
+            // printf("Check ber %d %02X %02X\n",di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.size(), (unsigned char)tree.node.at(p).type.ber, (unsigned char)di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.at(i)->sub.at(1)->type);
+            if (di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.at(i)->sub.at(1)->type != tree.node.at(p).type.ber) {
                 errorValue = ERROR_BADVALUE;
                 errorIndex = varbindCount;
                 return false;
             }
+            printf("TYPE VALID :)\n");
 
+            Value v;
+
+
+            bool correct = false;
+            // correct = checkSetSize();
+            if (!correct) {
+                errorValue = ERROR_BADVALUE;
+                errorIndex = varbindCount;
+                return false;
+            }
+            printf("SIZE VALID :)\n");
+            // correct = checkSetRange();
+            if (!correct) {
+                errorValue = ERROR_BADVALUE;
+                errorIndex = varbindCount;
+                return false;
+            }
+            printf("RANGE VALID :)\n");
 
 
         }

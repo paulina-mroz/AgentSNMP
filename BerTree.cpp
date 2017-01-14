@@ -11,7 +11,7 @@ BerTree::~BerTree() {
 }
 
 void BerTree::print_tree(int n) {
-    printf("BER TREE\n");
+    printf("BER TREE %ld\n", sub.size());
     if (!sub.empty()) {
         for (auto &node : sub) {
             printf("\t%02d ", n);

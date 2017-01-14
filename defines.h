@@ -11,8 +11,8 @@
 #endif
 
 #define PORT            161
-#define RECVBUF_SIZE    1024
-#define SENDBUF_SIZE    1024
+#define RECVBUF_SIZE    65507
+#define SENDBUF_SIZE    65507
 
 #define ERROR_NOERROR       0
 #define ERROR_TOOBIG        1

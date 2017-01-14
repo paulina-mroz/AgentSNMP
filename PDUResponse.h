@@ -8,6 +8,7 @@
 #include "SNMPSerializer.h"
 #include "MIBToolkit.h"
 #include "Tree.h"
+#include "Value.h"
 
 class PDUResponse {
 public:
@@ -20,13 +21,13 @@ public:
     void makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree &tree);
     void makeSkelPDU(SNMPSerializer &si);
     void makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si);
-    void makeWrongValuePDU(SNMPSerializer &si, Tree &tree);
+    void makeErrorPDU(SNMPSerializer &si, Tree &tree);
     void makeWrongSetPDU(SNMPSerializer &si, Tree &tree);
-    void makeGetPDU(SNMPSerializer &si, Tree &tree);
+    bool makeGetPDU(SNMPSerializer &si, Tree &tree);
 
     bool checkOidExistence(SNMPDeserializer &di, Tree &tree);
     bool checkOidExistenceNext(SNMPDeserializer &di, Tree &tree);
-    bool checkValueCorectness(BerTree &bt, Tree &tree);
+    bool checkValueCorectness(SNMPDeserializer &di, Tree &tree);
 
     MIBToolkit toolkitInst;
 
@@ -47,6 +48,8 @@ public:
     int errorValue;
     std::vector<int> oidList;
     std::vector<int> valueList;
+    std::vector<Value> valueValues;
+    int maxCount;
 
 };
 
