@@ -87,8 +87,9 @@ void Node::print_info() {
         // std::cout << ")" << std::endl;
     }
     if (!value.empty()) {
-        std::cout << "VALUES\n\t";
+        std::cout << "VALUES\n";
         for (auto &v : value) {
+            std::cout << "\t";
             for (auto &vid : v.id) {
                 printf("%ld.", vid);
             }
@@ -97,9 +98,11 @@ void Node::print_info() {
             } else if (type.storage == STORAGE_STR) {
                 std::cout << " " << v.valueStr << std::endl;
             } else if ((type.storage == STORAGE_OID) || (type.storage == STORAGE_IP)) {
+                std::cout << " ";
                 for (auto &val : v.valueOidIp) {
                     printf("%ld.", val);
                 }
+                std::cout << std::endl;
             }
         }
         std::cout << std::endl;

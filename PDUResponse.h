@@ -6,6 +6,7 @@
 #include "BerTree.h"
 #include "SNMPDeserializer.h"
 #include "SNMPSerializer.h"
+#include "MIBToolkit.h"
 #include "Tree.h"
 
 class PDUResponse {
@@ -20,10 +21,14 @@ public:
     void makeSkelPDU(SNMPSerializer &si);
     void makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si);
     void makeWrongValuePDU(SNMPSerializer &si, Tree &tree);
+    void makeWrongSetPDU(SNMPSerializer &si, Tree &tree);
+    void makeGetPDU(SNMPSerializer &si, Tree &tree);
 
     bool checkOidExistence(SNMPDeserializer &di, Tree &tree);
     bool checkOidExistenceNext(SNMPDeserializer &di, Tree &tree);
     bool checkValueCorectness(BerTree &bt, Tree &tree);
+
+    MIBToolkit toolkitInst;
 
     struct permissionStruct {
         std::string cs;

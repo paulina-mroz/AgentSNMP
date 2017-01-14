@@ -146,6 +146,11 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
             return;
     }
     printf("Varbind value correct :)\n");
+    if (requestType == typeMap["SETREQUEST"].ber) {
+        // SET HANDLING
+    }
+    makeGetPDU(si, tree);
+
 }
 
 void PDUResponse::makeSkelPDU(SNMPSerializer &si) {
@@ -207,6 +212,59 @@ void PDUResponse::makeWrongValuePDU(SNMPSerializer &si, Tree &tree) {
 
     si.assignBerTreeLength(si.berTreeInst);
 }
+
+void PDUResponse::makeWrongSetPDU(SNMPSerializer &si, Tree &tree) {
+}
+
+void PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
+    toolkitInst.updateValuesFromFile(tree);
+
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
+
+    for (int i = 0; i < oidList.size(); ++i) {
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.push_back(new BerTree());
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->type = typeMap["SEQUENCE"].ber;
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["OBJECT IDENTIFIER"].ber;
+        std::vector<long> fullOid;
+        for (auto &n : tree.node.at(oidList.at(i)).oid) {
+            fullOid.push_back(n);
+        }
+        for (auto &n : tree.node.at(oidList.at(i)).value.at(valueList.at(i)).id) {
+            fullOid.push_back(n);
+        }
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = si.getOidBer(fullOid);
+        si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
+
+        std::list<char> valueBer;
+        int storage = tree.node.at(oidList.at(i)).type.storage;
+
+        if (storage == STORAGE_INT) {
+            valueBer = si.getIntBer(tree.node.at(oidList.at(i)).value.at(valueList.at(i)).valueInt);
+        } else if (storage == STORAGE_IP) {
+            valueBer = si.getIpBer(tree.node.at(oidList.at(i)).value.at(valueList.at(i)).valueOidIp);
+        } else if (storage == STORAGE_OID) {
+            valueBer = si.getOidBer(tree.node.at(oidList.at(i)).value.at(valueList.at(i)).valueOidIp);
+        } else if (storage == STORAGE_STR) {
+            valueBer = si.getStrBer(tree.node.at(oidList.at(i)).value.at(valueList.at(i)).valueStr);
+        }
+
+        if (valueBer.empty()) {
+            si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["NULL"].ber;
+        } else {
+            si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = tree.node.at(oidList.at(i)).type.ber;
+            si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = valueBer;
+        }
+
+
+
+
+    }
+
+    si.assignBerTreeLength(si.berTreeInst);
+}
+
 
 bool PDUResponse::checkOidExistence(SNMPDeserializer &di, Tree &tree) {
     int varbindCount = 0;

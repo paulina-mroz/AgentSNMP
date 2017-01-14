@@ -23,7 +23,7 @@ public:
     SNMPDeserializer deserializerInst;
     SNMPSerializer serializerInst;
     PDUResponse responseInst;
-    MIBToolkit toolkitInst;
+    // MIBToolkit toolkitInst;
 
     bool debug_print;
 };

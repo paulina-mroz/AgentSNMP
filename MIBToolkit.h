@@ -15,6 +15,15 @@ public:
 
     void setHardcodedValues(Tree &tree);
     void setHardcodedTable(Tree &tree);
+    void setTableValues(Tree &tree, int tableIndex, std::string &line);
+
+    std::list<long> getIdFromString(int storage, std::string &value);
+    long getIntFromString(std::string &value);
+    std::vector<long> getIpFromString(std::string &value);
+    std::vector<long> getOidFromString(std::string &value);
+
+    void updateValuesFromFile(Tree &tree);
+    
 };
 
 #endif /* MIBTOOLKIT_H */

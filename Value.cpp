@@ -6,11 +6,10 @@
 #include "defines.h"
 
 Value::Value(){
-    DEBUG("Constructor\n");
+    valueInt = 0;
 }
 
 Value::~Value(){
-    DEBUG("Deconstructor\n");
 }
 
 bool Value::compareNode(std::list<long> const& ref) {

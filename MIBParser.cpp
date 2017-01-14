@@ -127,9 +127,17 @@ void MIBParser::setIndexIndex() {
         n.indexIndex.clear();
         if (!n.index.empty()) {
             for (auto &ind : n.index) {
+                // std::cout << "INDEX " << ind << std::endl;
                 int nodeIndex = tree.findNode(ind);
                 if (nodeIndex >= 0) {
-                    n.indexIndex.push_back(tree.node.at(nodeIndex).oid.back());
+                    long childNumber = tree.node.at(nodeIndex).oid.back();
+                    // std::cout << "CHILDREN ";
+                    // for (auto &ch : n.child) {
+                    //     std::cout << ch << " ";
+                    // }
+                    // std::cout << std::endl;
+                    // std::cout << "CHILD " << childNumber << std::endl;
+                    n.indexIndex.push_back(n.findChild(childNumber));
                 }
             }
         }
