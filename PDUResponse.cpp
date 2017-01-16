@@ -186,7 +186,7 @@ void PDUResponse::makeWrongOidPDU(SNMPDeserializer &di, SNMPSerializer &si) {
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
 
-    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->delete_tree();
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->deleteTree();
 
     for (auto &varbind : di.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.push_back(new BerTree());
@@ -206,7 +206,7 @@ void PDUResponse::makeErrorPDU(SNMPSerializer &si, Tree &tree) {
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(1)->content.push_back(errorValue);
     si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(2)->content.push_back(errorIndex);
 
-    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->delete_tree();
+    si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->deleteTree();
 
     // int oidMaxCount = (errorValue == ERROR_TOOBIG) ? (errorIndex) : oidList.size();
     for (int i = 0; i < maxCount; ++i) {

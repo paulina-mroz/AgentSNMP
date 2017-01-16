@@ -18,7 +18,7 @@ public:
     int findValue(std::list<long> const& ref);
     int findChild(long ref);
     int findNextChild(long ref);
-    void print_info();
+    void printInfo();
 
     std::vector<long> oid;
     std::vector<long> child;
@@ -43,9 +43,9 @@ public:
     ~Tree();
     int findNode(std::string const& ref);
     int findNode(std::vector<long> const& ref);
-    void print_tree();
-    void print_node(std::string const& name);
-    void print_node(std::vector<long> const& name);
+    void printTree();
+    void printNode(std::string const& name);
+    void printNode(std::vector<long> const& name);
     void print_vector(std::vector<long> v);
 
     std::vector<long> root;

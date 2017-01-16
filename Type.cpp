@@ -12,7 +12,7 @@ Type::Type() {
 Type::~Type() {
 }
 
-void Type::print_info() {
+void Type::printInfo() {
     std::cout << "\tPrimary type: " << primaryType << std::endl;
     std::cout << "\tStorage: " << storage << std::endl;
     std::cout << "\tBER: ";

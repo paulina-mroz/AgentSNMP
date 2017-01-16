@@ -25,7 +25,7 @@ public:
     PDUResponse responseInst;
     // MIBToolkit toolkitInst;
 
-    bool debug_print;
+    bool debugPrint;
 };
 
 #endif /* AGENTCLASS_h */

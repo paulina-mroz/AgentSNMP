@@ -10,7 +10,7 @@ class Type {
 public:
     Type();
     ~Type();
-    void print_info();
+    void printInfo();
 
     std::string primaryType;
     std::vector<long> size;

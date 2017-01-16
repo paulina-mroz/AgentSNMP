@@ -12,9 +12,9 @@ public:
     BerTree();
     ~BerTree();
 
-    void convert(std::string type);
-    void print_tree(int n);
-    void delete_tree();
+    void printTree();
+    void printNode(int n, std::vector<int> &printLevel);
+    void deleteTree();
 
     char type;
     std::list<char> length;

@@ -56,18 +56,18 @@ void MIBParser::initPrimaryTypes() {
 
     // for (auto &p : typeMap) {
     //     std::cout << "INFO " << p.first << std::endl;
-    //     p.second.print_info();
+    //     p.second.printInfo();
     // }
-    std::map <int, std::string> typeBer;
-    typeBer[0x02] = "INTEGER";
-    typeBer[0x04] = "OCTET STRING";
-    typeBer[0x30] = "SEQUENCE";
-    typeBer[0x05] = "NULL";
-    typeBer[0x06] = "OBJECT IDENTIFIER";
-    typeBer[0xA0] = "GETREQUEST";
-    typeBer[0xA1] = "GETNEXTREQUEST";
-    typeBer[0xA2] = "GETRESPONSE";
-    typeBer[0xA3] = "SETREQUEST";
+    // std::map <int, std::string> typeBer;
+    // typeBer[0x02] = "INTEGER";
+    // typeBer[0x04] = "OCTET STRING";
+    // typeBer[0x30] = "SEQUENCE";
+    // typeBer[0x05] = "NULL";
+    // typeBer[0x06] = "OBJECT IDENTIFIER";
+    // typeBer[0xA0] = "GETREQUEST";
+    // typeBer[0xA1] = "GETNEXTREQUEST";
+    // typeBer[0xA2] = "GETRESPONSE";
+    // typeBer[0xA3] = "SETREQUEST";
 }
 
 void MIBParser::getFile(std::string fileName, std::string &content) {
@@ -168,7 +168,7 @@ void MIBParser::handleImports(const std::string &block) {
             }
             // for (auto &p : typeMap) {
             //     std::cout << "INFO " << p.first << std::endl;
-            //     p.second.print_info();
+            //     p.second.printInfo();
             // }
         }
     }
@@ -231,7 +231,7 @@ void MIBParser::handleObjectType(const std::string &block) {
         tree.node.at(tree.findNode(name)).type.ber = typeMap[tree.node.at(tree.findNode(name)).type.primaryType].ber;
         tree.node.at(tree.findNode(name)).type.storage = typeMap[tree.node.at(tree.findNode(name)).type.primaryType].storage;
         // std::cout << "INFO " << name << std::endl;
-        // tree.node.at(tree.findNode(name)).type.print_info();
+        // tree.node.at(tree.findNode(name)).type.printInfo();
     }
 
 }

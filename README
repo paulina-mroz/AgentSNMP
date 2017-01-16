@@ -1,0 +1,62 @@
+Odpowiedzi na wymagania
+=========================
+
+Odpowiedzi na następujące pytania:
+a) czy działa obsługa importów
+b) czy program obsługuje większą wartość w polu identyfikatora niż 31? czy
+przyjmie wtedy prawidłowy format nagłówka ?
+c) czy program prawidłowo odczyta z systemu i zwróci wartość ujemną do
+klienta SNMP?
+d) czy jest obsługa operatora IMPLICIT?
+e) czy wartości są reprezentowane w kodzie za pomocą drzewa?
+f) jakie prawdziwe wartości z systemu potrafi program odczytać i przekazać?
+g) czy wartości zapisane przetrwają reset programu?
+h) czy mamy obsługę community-string?
+i) czy możemy wysłać do klienta w odpowiedzi więcej niż 128 bajtów danych
+lub też pobrać od klienta więcej niż 128 bajtów w polu danych?
+j) które prawdziwe wartości można odczytać z systemu operacyjnego? czy
+jakieś prawdziwe wartości można ustawić?
+
+na końcu można się pochwalić czymś co warto wspomnieć.
+
+
++ a) Działa.
++ b) Tak.
++ c) 
++ d) Tak.
+- e) Nie. Zapis w formie wektora.
+? f) 
+? g)
++ h) Tak.
++ i) Tak. Ograniczeniem jest wielkość pakietu UDP - ramka pakietu UDP.
+? j) To samo co f).
+
+
+Chwalenie się
+=========================
+
+Ścieżka bez hardkodowania
+--------------------
+{ iso org(3) dod(6) 1 }
+
+
+Community string z pliku
+--------------------
+
+
+Drzewo BER PDU
+--------------------
+
+
+Opcje przy uruchamianiu
+--------------------
+
+
+Tryb interaktywny
+--------------------
+
+
+Tabele
+--------------------
+
+

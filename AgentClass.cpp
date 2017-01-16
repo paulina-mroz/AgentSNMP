@@ -6,7 +6,7 @@
 #include "defines.h"
 
 AgentClass::AgentClass(){
-    debug_print = false;
+    debugPrint = false;
 }
 
 AgentClass::~AgentClass(){
@@ -29,11 +29,11 @@ void AgentClass::flow() {
     }
 
     while (true) {
-        if (debug_print) printf("\nWaiting for request...\n");
+        if (debugPrint) printf("\nWaiting for request...\n");
         serverInst.receiveMessage();
         readContent();
 
-        if (debug_print) {
+        if (debugPrint) {
             printf("\nReceived");
             for (int i = 0; i < serverInst.recvBufLength; ++i) {
                 if (i % 16 == 0) {
@@ -43,7 +43,7 @@ void AgentClass::flow() {
             }
             printf("\n");
             printf("\n");
-            deserializerInst.berTreeInst.print_tree(0);
+            deserializerInst.berTreeInst.printTree();
             printf("\n");
         }
 
@@ -55,9 +55,9 @@ void AgentClass::flow() {
                 responseInst.makeResponsePDU(deserializerInst,serializerInst,parserInst.tree);
                 makeContent();
 
-                if (debug_print) {
+                if (debugPrint) {
                     printf("\n");
-                    serializerInst.berTreeInst.print_tree(0);
+                    serializerInst.berTreeInst.printTree();
                     printf("\n");
                     printf("\nSending");
                     for (int i = 0; i < serverInst.sendBufLength; ++i) {
@@ -82,7 +82,7 @@ void AgentClass::readContent() {
     for (int i = 0; i < serverInst.recvBufLength; ++i) {
         deserializerInst.berTreeInst.content.push_back(serverInst.recvBuf[i]);
     }
-    deserializerInst.berTreeInst.delete_tree();
+    deserializerInst.berTreeInst.deleteTree();
     deserializerInst.makeBerTree();
 }
 

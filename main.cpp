@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
 
     if (argc == 2) {
         if ((!strcmp(argv[1], "--print_tree")) || (!strcmp(argv[1], "-t"))) {
-            agentInst.parserInst.tree.print_tree();
+            agentInst.parserInst.tree.printTree();
         }
         if ((!strcmp(argv[1], "--interactive")) || (!strcmp(argv[1], "-i"))) {
-            agentInst.debug_print = true;
+            agentInst.debugPrint = true;
             int rc = pthread_create(&interactiveThread, NULL, interactivePrint, NULL);
             if (rc) {
                 printf("Error: unable to enter interactive mode :(\n");
@@ -54,12 +54,12 @@ int main(int argc, char **argv) {
             }
         }
         if ((!strcmp(argv[1], "--debug")) || (!strcmp(argv[1], "-d"))) {
-            agentInst.debug_print = true;
+            agentInst.debugPrint = true;
         }
     } else if (argc == 3) {
         if ((!strcmp(argv[1], "--print_node_name")) || (!strcmp(argv[1], "-n"))) {
             std::string name(argv[2]);
-            agentInst.parserInst.tree.print_node(name);
+            agentInst.parserInst.tree.printNode(name);
         }
         if ((!strcmp(argv[1], "--print_node_oid")) || (!strcmp(argv[1], "-o"))) {
             std::string name(argv[2]);
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
             for (auto &p : v) {
                 v_int.push_back(std::stoi(p));
             }
-            agentInst.parserInst.tree.print_node(v_int);
+            agentInst.parserInst.tree.printNode(v_int);
         }
     }
 
@@ -83,12 +83,12 @@ void printMenu(std::vector<std::string> commands) {
             printf("Agent SNMP\n\thelp\n");
         }
         if ((commands.at(0) == "print_tree") || (commands.at(0) == "t")) {
-            agentInst.parserInst.tree.print_tree();
+            agentInst.parserInst.tree.printTree();
         }
     } else if (commands.size() == 2) {
         if ((commands.at(0) == "print_node_name") || (commands.at(0) == "n")) {
             std::string name = commands.at(1);
-            agentInst.parserInst.tree.print_node(name);
+            agentInst.parserInst.tree.printNode(name);
         }
         if ((commands.at(0) == "print_node_oid") || (commands.at(0) == "o")) {
             std::string name = commands.at(1);
@@ -98,7 +98,7 @@ void printMenu(std::vector<std::string> commands) {
             for (auto &p : v) {
                 v_int.push_back(std::stoi(p));
             }
-            agentInst.parserInst.tree.print_node(v_int);
+            agentInst.parserInst.tree.printNode(v_int);
         }
     }
 }

@@ -11,11 +11,9 @@
 #include "defines.h"
 
 MIBToolkit::MIBToolkit(){
-    DEBUG("Constructor\n");
 }
 
 MIBToolkit::~MIBToolkit(){
-    DEBUG("Deconstructor\n");
 }
 
 void MIBToolkit::setHardcodedValues(Tree &tree) {

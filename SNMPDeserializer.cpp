@@ -8,7 +8,7 @@ SNMPDeserializer::SNMPDeserializer() {
 }
 
 SNMPDeserializer::~SNMPDeserializer() {
-    berTreeInst.delete_tree();
+    berTreeInst.deleteTree();
 }
 
 bool SNMPDeserializer::checkRequest() {
