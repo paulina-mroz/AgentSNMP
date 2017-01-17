@@ -20,6 +20,10 @@ void AgentClass::init() {
     responseInst.toolkitInst.setHardcodedValues(parserInst.tree);
     responseInst.toolkitInst.setHardcodedTable(parserInst.tree);
     responseInst.initPermissions(filePermissions);
+
+    for (int i = 0; i < parserInst.tree.node.size(); ++i) {
+        responseInst.toolkitInst.updateValuesFromFile(parserInst.tree, i);
+    }
 }
 
 void AgentClass::flow() {

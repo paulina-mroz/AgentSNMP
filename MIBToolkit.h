@@ -22,8 +22,8 @@ public:
     std::vector<long> getIpFromString(std::string &value);
     std::vector<long> getOidFromString(std::string &value);
 
-    void updateValuesFromFile(Tree &tree);
-    
+    void updateValuesFromFile(Tree &tree, int index);
+
 };
 
 #endif /* MIBTOOLKIT_H */

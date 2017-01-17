@@ -258,6 +258,8 @@ bool PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->content = si.getOidBer(fullOid);
         si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.push_back(new BerTree());
 
+        // toolkitInst.updateValuesFromFile(tree, oidList.at(i));
+
         std::list<char> valueBer;
         int storage = tree.node.at(oidList.at(i)).type.storage;
 
@@ -271,7 +273,7 @@ bool PDUResponse::makeGetPDU(SNMPSerializer &si, Tree &tree) {
             valueBer = si.getStrBer(tree.node.at(oidList.at(i)).value.at(valueList.at(i)).valueStr);
         }
 
-        if (valueBer.empty()) {
+        if ((valueBer.empty()) && (storage != STORAGE_STR)) {
             si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = typeMap["NULL"].ber;
         } else {
             si.berTreeInst.sub.at(0)->sub.at(2)->sub.at(3)->sub.back()->sub.back()->type = tree.node.at(oidList.at(i)).type.ber;

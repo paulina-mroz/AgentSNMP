@@ -93,6 +93,7 @@ void Node::printInfo() {
             for (auto &vid : v.id) {
                 printf("%ld.", vid);
             }
+            std::cout << "\n\t\t";
             if (type.storage == STORAGE_INT) {
                 std::cout << " " << v.valueInt << std::endl;
             } else if (type.storage == STORAGE_STR) {

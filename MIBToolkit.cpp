@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include <regex>
 
 #include <boost/algorithm/string.hpp>
@@ -105,7 +106,7 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
     boost::trim(lineValues);
     std::cout << lineValues << std::endl;
     std::vector<std::string> values;
-    boost::split_regex(values, lineValues, boost::regex( "[\"]+" ));
+    boost::split_regex(values, lineValues, boost::regex( "[\"]{1}" ));
 
     for(auto &v : values) {
         boost::trim(v);
@@ -113,11 +114,15 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
     }
 
     std::cout << "CHILDREN COUNT " << tree.node.at(tableIndex).child.size() << std::endl;
+    std::cout << "index count " <<  tree.node.at(tableIndex).index.size() << std::endl;
 
+    int indexCount = 0;
     std::list<long> valueID;
     for (auto &indexNumber : tree.node.at(tableIndex).indexIndex) {
+        std::cout << "index index " << indexNumber << " size " <<  values.size() << std::endl;
         if (indexNumber < values.size()) {
-            int indexID = tree.findNode(tree.node.at(tableIndex).index.at(indexNumber));
+            std::cout << "index index " << indexNumber << " size " <<  values.size() << std::endl;
+            int indexID = tree.findNode(tree.node.at(tableIndex).index.at(indexCount));
             std::cout << "INDEX ID " << indexID << std::endl;
             if (indexID >= 0) {
                 std::list<long> valueSubID = getIdFromString(tree.node.at(indexID).type.storage, values.at(indexNumber));
@@ -127,6 +132,7 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
                 int valueExistID = tree.node.at(indexID).findValue(valueID);
                 std::cout << "INDEX EXIST ID " << valueExistID << std::endl;
                 if (valueExistID >= 0) {
+                    std::cout << "index exists" << std::endl;
                     indexCorrect = false;
                 }
             } else {
@@ -135,6 +141,7 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
         } else {
             indexCorrect = false;
         }
+        indexCount++;
     }
 
     if (indexCorrect) {
@@ -170,7 +177,7 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
 }
 
 std::list<long> MIBToolkit::getIdFromString(int storage, std::string &value) {
-    std::cout << value << std::endl;
+    std::cout << "IdFromString--" << value << std::endl;
     std::list<long> id;
     std::vector<long> vid;
 
@@ -257,6 +264,21 @@ std::vector<long> MIBToolkit::getOidFromString(std::string &value) {
     return ret;
 }
 
-void MIBToolkit::updateValuesFromFile(Tree &tree) {
+void MIBToolkit::updateValuesFromFile(Tree &tree, int index) {
+    std::cout << "FILE index " << index << std::endl;
+    if (index < 0) {
+        return;
+    }
 
+    if (tree.node.at(index).name == "atEntry") {
+        std::ifstream myfile("data/table_atentry.data");
+        std::string line;
+        if(myfile.is_open()) {
+            while (std::getline(myfile,line)) {
+                std::cout << "FILE line--" << line << std::endl;
+                setTableValues(tree, index, line);
+            }
+        }
+
+    }
 }
