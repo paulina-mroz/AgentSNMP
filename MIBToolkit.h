@@ -23,7 +23,11 @@ public:
     std::vector<long> getIpFromString(std::string &value);
     std::vector<long> getOidFromString(std::string &value);
 
-    void updateValuesFromFile(Tree &tree, int index);
+    std::string saveIntToString(long value);
+    std::string saveOidIpToString(std::vector<long> value);
+
+    void updateValuesFromFile(Tree &tree, int index, int val);
+    void saveValuesToFile(Tree &tree, int index, int val);
 
 };
 

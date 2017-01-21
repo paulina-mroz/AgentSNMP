@@ -23,7 +23,7 @@ void AgentClass::init() {
     responseInst.initPermissions(filePermissions);
 
     for (int i = 0; i < parserInst.tree.node.size(); ++i) {
-        responseInst.toolkitInst.updateValuesFromFile(parserInst.tree, i);
+        responseInst.toolkitInst.updateValuesFromFile(parserInst.tree, i, 0);
     }
 }
 
@@ -47,13 +47,13 @@ void AgentClass::flow() {
                 printf("%02X ",serverInst.recvBuf[i]);
             }
             printf("\n");
-            printf("\n");
+            printf("Received PDU\n");
             deserializerInst.berTreeInst.printTree();
             printf("\n");
         }
 
         if (!deserializerInst.checkRequest()) {
-            printf("Wrong request :(\n");
+            // printf("Wrong request :(\n");
         } else {
             if (responseInst.getPermissions(deserializerInst.communityString, serverInst.clientAddress.sin_addr.s_addr)) {
                 serializerInst.makeResponseSkel(deserializerInst.communityString);
@@ -61,7 +61,7 @@ void AgentClass::flow() {
                 makeContent();
 
                 if (debugPrint) {
-                    printf("\n");
+                    printf("Sending PDU\n");
                     serializerInst.berTreeInst.printTree();
                     printf("\n");
                     printf("\nSending");
@@ -75,8 +75,8 @@ void AgentClass::flow() {
                 }
 
                 serverInst.sendResponse();
-            } else {
-                printf("Do not got permissions :(\n");
+            // } else {
+            //     printf("Do not got permissions :(\n");
             }
         }
     }

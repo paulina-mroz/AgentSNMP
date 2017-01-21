@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <string>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
@@ -36,46 +37,46 @@ void MIBToolkit::initTreeValues(Tree &tree) {
 
 
 void MIBToolkit::setHardcodedValues(Tree &tree) {
-    int index = -1;
-    index = tree.findNode("sysDescr"); //RO
-    if (index > -1) {
-        Value v;
-        v.id.push_back(0);
-        v.valueStr = "DESCRIPTION TesT";
-        tree.node.at(index).value.push_back(v);
-    }
-
-    index = tree.findNode("sysContact"); //RW
-    if (index > -1) {
-        Value v;
-        v.id.push_back(0);
-        v.valueStr = "contact@example";
-        tree.node.at(index).value.push_back(v);
-        Value v2;
-        v2.id.push_back(2);
-        v2.valueStr = "contact@example";
-        tree.node.at(index).value.push_back(v2);
-        tree.node.at(index).oid.back() = 4000;
-    }
-
-    index = tree.findNode("sysName");
-    if (index > -1) {
-        Value v;
-        v.id.push_back(0);
-        v.valueStr = "access changed for testing";
-        tree.node.at(index).value.push_back(v);
-        tree.node.at(index).access = "not-accessible";
-    }
-
-    index = tree.findNode("sysServices");
-    if (index > -1) {
-        Value v;
-        v.id.push_back(0);
-        v.valueInt = 5;
-        tree.node.at(index).value.push_back(v);
-        tree.node.at(index).access = "read-write";
-        tree.node.at(index).oid.back() = 4001;
-    }
+    // int index = -1;
+    // index = tree.findNode("sysDescr"); //RO
+    // if (index > -1) {
+    //     Value v;
+    //     v.id.push_back(0);
+    //     v.valueStr = "DESCRIPTION TesT";
+    //     tree.node.at(index).value.push_back(v);
+    // }
+    //
+    // index = tree.findNode("sysContact"); //RW
+    // if (index > -1) {
+    //     Value v;
+    //     v.id.push_back(0);
+    //     v.valueStr = "contact@example";
+    //     tree.node.at(index).value.push_back(v);
+    //     Value v2;
+    //     v2.id.push_back(2);
+    //     v2.valueStr = "contact@example";
+    //     tree.node.at(index).value.push_back(v2);
+    //     tree.node.at(index).oid.back() = 4000;
+    // }
+    //
+    // index = tree.findNode("sysName");
+    // if (index > -1) {
+    //     Value v;
+    //     v.id.push_back(0);
+    //     v.valueStr = "access changed for testing";
+    //     tree.node.at(index).value.push_back(v);
+    //     tree.node.at(index).access = "not-accessible";
+    // }
+    //
+    // index = tree.findNode("sysServices");
+    // if (index > -1) {
+    //     Value v;
+    //     v.id.push_back(0);
+    //     v.valueInt = 5;
+    //     tree.node.at(index).value.push_back(v);
+    //     tree.node.at(index).access = "read-write";
+    //     tree.node.at(index).oid.back() = 4001;
+    // }
 }
 
 void MIBToolkit::setHardcodedTable(Tree &tree) {
@@ -119,38 +120,38 @@ void MIBToolkit::setHardcodedTable(Tree &tree) {
 void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
     bool indexCorrect = true;
     std::string lineValues = line;
-    std::cout << lineValues << std::endl;
+    // std::cout << lineValues << std::endl;
 
     boost::trim(lineValues);
-    std::cout << lineValues << std::endl;
+    // std::cout << lineValues << std::endl;
     std::vector<std::string> values;
     boost::split_regex(values, lineValues, boost::regex( "[\"]{1}" ));
 
     for(auto &v : values) {
         boost::trim(v);
-        std::cout << "val ---" << v << "---" << std::endl;
+        // std::cout << "val ---" << v << "---" << std::endl;
     }
 
-    std::cout << "CHILDREN COUNT " << tree.node.at(tableIndex).child.size() << std::endl;
-    std::cout << "index count " <<  tree.node.at(tableIndex).index.size() << std::endl;
+    // std::cout << "CHILDREN COUNT " << tree.node.at(tableIndex).child.size() << std::endl;
+    // std::cout << "index count " <<  tree.node.at(tableIndex).index.size() << std::endl;
 
     int indexCount = 0;
     std::list<long> valueID;
     for (auto &indexNumber : tree.node.at(tableIndex).indexIndex) {
-        std::cout << "index index " << indexNumber << " size " <<  values.size() << std::endl;
+        // std::cout << "index index " << indexNumber << " size " <<  values.size() << std::endl;
         if (indexNumber < values.size()) {
-            std::cout << "index index " << indexNumber << " size " <<  values.size() << std::endl;
+            // std::cout << "index index " << indexNumber << " size " <<  values.size() << std::endl;
             int indexID = tree.findNode(tree.node.at(tableIndex).index.at(indexCount));
-            std::cout << "INDEX ID " << indexID << std::endl;
+            // std::cout << "INDEX ID " << indexID << std::endl;
             if (indexID >= 0) {
                 std::list<long> valueSubID = getIdFromString(tree.node.at(indexID).type.storage, values.at(indexNumber));
                 for (auto &subid : valueSubID) {
                     valueID.push_back(subid);
                 }
                 int valueExistID = tree.node.at(indexID).findValue(valueID);
-                std::cout << "INDEX EXIST ID " << valueExistID << std::endl;
+                // std::cout << "INDEX EXIST ID " << valueExistID << std::endl;
                 if (valueExistID >= 0) {
-                    std::cout << "index exists" << std::endl;
+                    // std::cout << "index exists" << std::endl;
                     indexCorrect = false;
                 }
             } else {
@@ -163,7 +164,7 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
     }
 
     if (indexCorrect) {
-        std::cout << "INDEX OK" << std::endl;
+        // std::cout << "INDEX OK" << std::endl;
 
 
 
@@ -195,7 +196,7 @@ void MIBToolkit::setTableValues(Tree &tree, int tableIndex, std::string &line) {
 }
 
 std::list<long> MIBToolkit::getIdFromString(int storage, std::string &value) {
-    std::cout << "IdFromString--" << value << std::endl;
+    // std::cout << "IdFromString--" << value << std::endl;
     std::list<long> id;
     std::vector<long> vid;
 
@@ -210,11 +211,11 @@ std::list<long> MIBToolkit::getIdFromString(int storage, std::string &value) {
     for (auto &p : vid) {
         id.push_back(p);
     }
-    std::cout << "ID from string: ";
-    for (auto &p : id) {
-        std::cout << p << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "ID from string: ";
+    // for (auto &p : id) {
+    //     std::cout << p << " ";
+    // }
+    // std::cout << std::endl;
     return id;
 }
 
@@ -282,21 +283,144 @@ std::vector<long> MIBToolkit::getOidFromString(std::string &value) {
     return ret;
 }
 
-void MIBToolkit::updateValuesFromFile(Tree &tree, int index) {
-    std::cout << "FILE index " << index << std::endl;
+std::string MIBToolkit::saveIntToString(long value) {
+    std::string ret;
+    ret = std::to_string(value);
+    return ret;
+}
+
+std::string MIBToolkit::saveOidIpToString(std::vector<long> value) {
+    std::string ret;
+    bool first = true;
+    for (auto &p : value) {
+        if (!first) {
+            ret += ".";
+        }
+        ret += std::to_string(p);
+        first = false;
+    }
+    return ret;
+}
+
+
+void MIBToolkit::updateValuesFromFile(Tree &tree, int index, int val) {
+    // std::cout << "FILE index " << index << std::endl;
+    bool valueCorrect = false;
+    std::string block;
+
     if (index < 0) {
         return;
     }
 
     if (tree.node.at(index).name == "atEntry") {
-        std::ifstream myfile("data/table_atentry.data");
+        std::ifstream myfile("data/table_atEntry.data");
         std::string line;
         if(myfile.is_open()) {
             while (std::getline(myfile,line)) {
-                std::cout << "FILE line--" << line << std::endl;
+                // std::cout << "FILE line--" << line << std::endl;
                 setTableValues(tree, index, line);
             }
         }
+        return;
+    }
 
+    if (tree.node.at(index).name == "sysName") {
+        std::ifstream myfile("/etc/hostname");
+        std::string line;
+        if(myfile.is_open()) {
+            while (std::getline(myfile,line)) {
+                block += line;
+            }
+        }
+        boost::trim(block);
+        valueCorrect = true;
+    }
+
+    if (tree.node.at(index).name == "sysDescr") {
+        std::vector<std::string> files;
+        files.push_back("/proc/sys/kernel/ostype");
+        files.push_back("/proc/sys/kernel/hostname");
+        files.push_back("/proc/sys/kernel/osrelease");
+        files.push_back("/proc/sys/kernel/version");
+
+        for (auto &f: files) {
+            std::ifstream myfile(f);
+            std::string line;
+            std::string subblock;
+            if(myfile.is_open()) {
+                while (std::getline(myfile,line)) {
+                    subblock += line;
+                }
+            }
+            boost::trim(subblock);
+            block += subblock;
+            block += " ";
+        }
+
+        valueCorrect = true;
+    }
+
+    if (tree.node.at(index).name == "sysContact") {
+        std::ifstream myfile("data/sysContact.data");
+        std::string line;
+        if(myfile.is_open()) {
+            while (std::getline(myfile,line)) {
+                block += line;
+            }
+        }
+        boost::trim(block);
+        valueCorrect = true;
+    }
+
+    if (tree.node.at(index).name == "ifNumber") {
+        std::ifstream myfile("data/ifNumber.data");
+        std::string line;
+        if(myfile.is_open()) {
+            while (std::getline(myfile,line)) {
+                block += line;
+            }
+        }
+        boost::trim(block);
+        valueCorrect = true;
+    }
+
+    if (valueCorrect) {
+        if (tree.node.at(index).value.empty()) {
+            Value v;
+            v.id.push_back(0);
+            tree.node.at(index).value.push_back(v);
+            val = 0;
+        }
+
+        int storage = tree.node.at(index).type.storage;
+        if (storage == STORAGE_INT) {
+            tree.node.at(index).value.at(val).valueInt = getIntFromString(block);
+        } else if (storage == STORAGE_IP) {
+            tree.node.at(index).value.at(val).valueOidIp = getIpFromString(block);
+        } else if (storage == STORAGE_OID) {
+            tree.node.at(index).value.at(val).valueOidIp = getOidFromString(block);
+        } else if (storage == STORAGE_STR) {
+            tree.node.at(index).value.at(val).valueStr = block;
+        }
+        return;
+    }
+}
+
+void MIBToolkit::saveValuesToFile(Tree &tree, int index, int val) {
+    std::string block;
+    int storage = tree.node.at(index).type.storage;
+    if (storage == STORAGE_INT) {
+        block = saveIntToString(tree.node.at(index).value.at(val).valueInt);
+    } else if (storage == STORAGE_IP) {
+        block = saveOidIpToString(tree.node.at(index).value.at(val).valueOidIp);
+    } else if (storage == STORAGE_OID) {
+        block = saveOidIpToString(tree.node.at(index).value.at(val).valueOidIp);
+    } else if (storage == STORAGE_STR) {
+        block = tree.node.at(index).value.at(val).valueStr;
+    }
+
+    if (tree.node.at(index).name == "sysContact") {
+        std::ofstream myfile("data/sysContact.data");
+        myfile << block << std::endl;
     }
 }

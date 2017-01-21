@@ -34,7 +34,7 @@ bool SNMPDeserializer::checkRequest() {
         return false;
     }
 
-    printf("Request correct :)\n");
+    // printf("Request correct :)\n");
     return true;
 }
 
