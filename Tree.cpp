@@ -175,7 +175,7 @@ void Tree::printTree() {
                     printf("\u251C\u2500 ");
                 }
             }
-            print_vector(id);
+            printVector(id);
             // std::cout << " " << node.at(ind).name << std::endl;
             if (!node.at(ind).value.empty()) {
                 printf(" [%d]", node.at(ind).value.size());
@@ -186,27 +186,7 @@ void Tree::printTree() {
     }
 }
 
-void Tree::printNode(std::string const& name) {
-    std::cout << "INFO about: " << name << std::endl;
-    if (findNode(name) < 0) {
-        std::cout << "Does not exist :(" << std::endl;
-        return;
-    }
-    node.at(findNode(name)).printInfo();
-}
-
-void Tree::printNode(std::vector<long> const& name) {
-    std::cout << "INFO about: ";
-    print_vector(name);
-    std::cout << std::endl;
-    if (findNode(name) < 0) {
-        std::cout << "Does not exist :(" << std::endl;
-        return;
-    }
-    node.at(findNode(name)).printInfo();
-}
-
-void Tree::print_vector(std::vector<long> v) {
+void Tree::printVector(std::vector<long> v) {
     for (std::vector<long>::iterator it=v.begin(); it<v.end(); ++it) {
         printf("%ld.", *it);
     }

@@ -18,6 +18,10 @@ public:
     void readContent();
     void makeContent();
 
+    void printNode(std::string const& name);
+    void printNode(std::vector<long> const& name);
+    void printInternal(int index);
+
     MIBParser parserInst;
     SNMPServer serverInst;
     SNMPDeserializer deserializerInst;

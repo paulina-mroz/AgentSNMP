@@ -44,9 +44,7 @@ public:
     int findNode(std::string const& ref);
     int findNode(std::vector<long> const& ref);
     void printTree();
-    void printNode(std::string const& name);
-    void printNode(std::vector<long> const& name);
-    void print_vector(std::vector<long> v);
+    void printVector(std::vector<long> v);
 
     std::vector<long> root;
     std::vector<Node> node;

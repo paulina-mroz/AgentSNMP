@@ -125,31 +125,14 @@ void PDUResponse::makeResponsePDU(SNMPDeserializer &di, SNMPSerializer &si, Tree
             makeWrongOidPDU(di, si);
             return;
     }
-    // printf("Varbind OID correct :)\n");
-    int varbindCount = 0;
-    for (auto &p : oidList) {
-        varbindCount++;
-        printf("OID %d: ", p);
-        for (auto &o : tree.node.at(p).oid) {
-            printf("%ld.", o);
-        }
-        printf("\n");
-        long val = valueList.at(varbindCount-1);
-        printf("Value %d: ", val);
-        for (auto &o : tree.node.at(p).value.at(val).id) {
-            printf("%ld.", o);
-        }
-        printf("\n");
-    }
+
     maxCount = oidList.size();
     correct = checkValueCorectness(di, tree);
     if (!correct) {
         makeErrorPDU(si, tree);
         return;
     }
-    // printf("Varbind value correct :)\n");
     if (requestType == typeMap["SETREQUEST"].ber) {
-        // printf("SET HANDLING :)\n");
         saveValuesToTree(tree);
         for (int i = 0; i < oidList.size(); ++i) {
             toolkitInst.saveValuesToFile(tree, oidList.at(i), valueList.at(i));

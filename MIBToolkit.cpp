@@ -4,6 +4,8 @@
 #include <fstream>
 #include <regex>
 #include <string>
+#include <chrono>
+#include <ratio>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
@@ -17,6 +19,11 @@ MIBToolkit::MIBToolkit(){
 
 MIBToolkit::~MIBToolkit(){
 }
+
+void MIBToolkit::initUpTime() {
+    startTime = std::chrono::steady_clock::now();
+}
+
 
 void MIBToolkit::initTreeValues(Tree &tree) {
     for (int i = 0; i < tree.node.size(); ++i) {
@@ -37,73 +44,46 @@ void MIBToolkit::initTreeValues(Tree &tree) {
 
 
 void MIBToolkit::setHardcodedValues(Tree &tree) {
-    // int index = -1;
-    // index = tree.findNode("sysDescr"); //RO
-    // if (index > -1) {
-    //     Value v;
-    //     v.id.push_back(0);
-    //     v.valueStr = "DESCRIPTION TesT";
-    //     tree.node.at(index).value.push_back(v);
-    // }
-    //
-    // index = tree.findNode("sysContact"); //RW
-    // if (index > -1) {
-    //     Value v;
-    //     v.id.push_back(0);
-    //     v.valueStr = "contact@example";
-    //     tree.node.at(index).value.push_back(v);
-    //     Value v2;
-    //     v2.id.push_back(2);
-    //     v2.valueStr = "contact@example";
-    //     tree.node.at(index).value.push_back(v2);
-    //     tree.node.at(index).oid.back() = 4000;
-    // }
-    //
-    // index = tree.findNode("sysName");
-    // if (index > -1) {
-    //     Value v;
-    //     v.id.push_back(0);
-    //     v.valueStr = "access changed for testing";
-    //     tree.node.at(index).value.push_back(v);
-    //     tree.node.at(index).access = "not-accessible";
-    // }
-    //
-    // index = tree.findNode("sysServices");
-    // if (index > -1) {
-    //     Value v;
-    //     v.id.push_back(0);
-    //     v.valueInt = 5;
-    //     tree.node.at(index).value.push_back(v);
-    //     tree.node.at(index).access = "read-write";
-    //     tree.node.at(index).oid.back() = 4001;
-    // }
+    int index = -1;
+
+    index = tree.findNode("sysObjectID");
+    if (index > -1) {
+        tree.node.at(index).access = "read-write";
+        return;
+    }
+
+    index = tree.findNode("ifNumber");
+    if (index > -1) {
+        tree.node.at(index).access = "read-write";
+        return;
+    }
+
+    index = tree.findNode("sysLocation");
+    if (index > -1) {
+        tree.node.at(index).access = "not-accessible";
+        tree.node.at(index).value.at(0).valueStr = "not-accessible for testing";
+        return;
+    }
+
+    index = tree.findNode("sysServices");
+    if (index > -1) {
+        tree.node.at(index).access = "read-write";
+        tree.node.at(index).type.range.at(1) = 10;
+        return;
+    }
+
+    index = tree.findNode("sysContact");
+    if (index > -1) {
+        tree.node.at(index).value.at(0).valueStr = "contact@example";
+        return;
+    }
+
 }
 
 void MIBToolkit::setHardcodedTable(Tree &tree) {
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.1. ifIndex
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.2. ifDescr
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.3. ifType
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.4. ifMtu
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.5. ifSpeed
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.6. ifPhysAddress
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.7. ifAdminStatus
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.8. ifOperStatus
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.9. ifLastChange
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.10. ifInOctets
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.11. ifInUcastPkts
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.12. ifInNUcastPkts
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.13. ifInDiscards
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.14. ifInErrors
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.15. ifInUnknownProtos
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.16. ifOutOctets
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.17. ifOutUcastPkts
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.18. ifOutNUcastPkts
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.19. ifOutDiscards
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.20. ifOutErrors
-// │     │        ├─ 1.3.6.1.2.1.2.2.1.21. ifOutQLen
-// │     │        └─ 1.3.6.1.2.1.2.2.1.22. ifSpecific
+    int index = -1;
 
-    int index = tree.findNode("ifEntry");
+    index = tree.findNode("ifEntry");
     if (index > -1) {
         std::string line;
         line = " 100 \" descr 1 \" 11 \" 1000 \" 666 \" 3.5.7.9 \" 3 \" 1 \" 0 \" 55 \" 1 \" 0 \"  \"  \"  \"  \"  \"  \"  \"  \"  \" 3.655 \"  ";
@@ -112,6 +92,7 @@ void MIBToolkit::setHardcodedTable(Tree &tree) {
         setTableValues(tree, index, line);
         line = "  10 \" descr_2 \" 10 \" 170  \" 600 \"         \" 1 \" 3 \" 0 \" 8  \" 1 \" 0 \"  \"  \"  \"  \"  \"  \"  \"  \"  \" 1.3.6 \"  ";
         setTableValues(tree, index, line);
+        return;
     }
 
 
@@ -304,7 +285,6 @@ std::string MIBToolkit::saveOidIpToString(std::vector<long> value) {
 
 
 void MIBToolkit::updateValuesFromFile(Tree &tree, int index, int val) {
-    // std::cout << "FILE index " << index << std::endl;
     bool valueCorrect = false;
     std::string block;
 
@@ -317,24 +297,19 @@ void MIBToolkit::updateValuesFromFile(Tree &tree, int index, int val) {
         std::string line;
         if(myfile.is_open()) {
             while (std::getline(myfile,line)) {
-                // std::cout << "FILE line--" << line << std::endl;
                 setTableValues(tree, index, line);
             }
         }
         return;
     }
 
-    if (tree.node.at(index).name == "sysName") {
-        std::ifstream myfile("/etc/hostname");
-        std::string line;
-        if(myfile.is_open()) {
-            while (std::getline(myfile,line)) {
-                block += line;
-            }
-        }
-        boost::trim(block);
-        valueCorrect = true;
+    if (tree.node.at(index).name == "sysUpTime") {
+        std::chrono::steady_clock::time_point nowTime = std::chrono::steady_clock::now();
+        auto upTime = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime);
+        tree.node.at(index).value.at(val).valueInt = (long)(upTime.count() / 10);
+        return;
     }
+
 
     if (tree.node.at(index).name == "sysDescr") {
         std::vector<std::string> files;
@@ -360,6 +335,32 @@ void MIBToolkit::updateValuesFromFile(Tree &tree, int index, int val) {
         valueCorrect = true;
     }
 
+    if (tree.node.at(index).name == "sysObjectID") {
+        std::ifstream myfile("data/sysObjectID.data");
+        std::string line;
+        if(myfile.is_open()) {
+            while (std::getline(myfile,line)) {
+                block += line;
+            }
+        }
+        boost::trim(block);
+        valueCorrect = true;
+    }
+
+    if (tree.node.at(index).name == "sysName") {
+        std::ifstream myfile("/proc/sys/kernel/hostname");
+        std::string line;
+        if(myfile.is_open()) {
+            while (std::getline(myfile,line)) {
+                block += line;
+            }
+        }
+        boost::trim(block);
+        valueCorrect = true;
+    }
+
+
+
     if (tree.node.at(index).name == "sysContact") {
         std::ifstream myfile("data/sysContact.data");
         std::string line;
@@ -384,6 +385,7 @@ void MIBToolkit::updateValuesFromFile(Tree &tree, int index, int val) {
         valueCorrect = true;
     }
 
+    std::cout << "Block from file: " << block << std::endl;
     if (valueCorrect) {
         if (tree.node.at(index).value.empty()) {
             Value v;
@@ -419,8 +421,25 @@ void MIBToolkit::saveValuesToFile(Tree &tree, int index, int val) {
         block = tree.node.at(index).value.at(val).valueStr;
     }
 
+    std::cout << "Block to save: " << block << std::endl;
+
     if (tree.node.at(index).name == "sysContact") {
         std::ofstream myfile("data/sysContact.data");
+        myfile << block << std::endl;
+    }
+
+    if (tree.node.at(index).name == "sysObjectID") {
+        std::ofstream myfile("data/sysObjectID.data");
+        myfile << block << std::endl;
+    }
+
+    if (tree.node.at(index).name == "sysName") {
+        std::ofstream myfile("/etc/hostname");
+        myfile << block << std::endl;
+    }
+
+    if (tree.node.at(index).name == "ifNumber") {
+        std::ofstream myfile("data/ifNumber.data");
         myfile << block << std::endl;
     }
 }

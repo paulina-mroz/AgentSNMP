@@ -2,6 +2,7 @@
 #define MIBTOOLKIT_H
 
 #include <string>
+#include <chrono>
 #include "defines.h"
 #include "BerTree.h"
 #include "SNMPDeserializer.h"
@@ -13,6 +14,7 @@ public:
     MIBToolkit();
     ~MIBToolkit();
 
+    void initUpTime();
     void initTreeValues(Tree &tree);
     void setHardcodedValues(Tree &tree);
     void setHardcodedTable(Tree &tree);
@@ -28,6 +30,8 @@ public:
 
     void updateValuesFromFile(Tree &tree, int index, int val);
     void saveValuesToFile(Tree &tree, int index, int val);
+
+    std::chrono::steady_clock::time_point startTime;
 
 };
 
