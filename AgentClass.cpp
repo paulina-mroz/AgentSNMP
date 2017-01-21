@@ -17,6 +17,7 @@ void AgentClass::init() {
     std::string filePermissions = "data/community_string.conf";
 
     parserInst.parseFile(fileMIB);
+    responseInst.toolkitInst.initTreeValues(parserInst.tree);
     responseInst.toolkitInst.setHardcodedValues(parserInst.tree);
     responseInst.toolkitInst.setHardcodedTable(parserInst.tree);
     responseInst.initPermissions(filePermissions);

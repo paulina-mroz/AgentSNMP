@@ -85,6 +85,9 @@ void printMenu(std::vector<std::string> commands) {
         if ((commands.at(0) == "print_tree") || (commands.at(0) == "t")) {
             agentInst.parserInst.tree.printTree();
         }
+        if ((commands.at(0) == "exit") || (commands.at(0) == "quit")) {
+            exit(0);
+        }
     } else if (commands.size() == 2) {
         if ((commands.at(0) == "print_node_name") || (commands.at(0) == "n")) {
             std::string name = commands.at(1);

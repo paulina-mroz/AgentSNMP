@@ -17,6 +17,24 @@ MIBToolkit::MIBToolkit(){
 MIBToolkit::~MIBToolkit(){
 }
 
+void MIBToolkit::initTreeValues(Tree &tree) {
+    for (int i = 0; i < tree.node.size(); ++i) {
+        if ((!tree.node.at(i).syntax.empty()) && (tree.node.at(i).access != "not-accessible")) {
+            std::vector<long> id = tree.node.at(i).oid;
+            id.pop_back();
+            int ind = tree.findNode(id);
+            if (ind >= 0) {
+                if (tree.node.at(ind).index.empty()) {
+                    Value v;
+                    v.id.push_back(0);
+                    tree.node.at(i).value.push_back(v);
+                }
+            }
+        }
+    }
+}
+
+
 void MIBToolkit::setHardcodedValues(Tree &tree) {
     int index = -1;
     index = tree.findNode("sysDescr"); //RO

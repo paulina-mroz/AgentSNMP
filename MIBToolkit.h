@@ -13,6 +13,7 @@ public:
     MIBToolkit();
     ~MIBToolkit();
 
+    void initTreeValues(Tree &tree);
     void setHardcodedValues(Tree &tree);
     void setHardcodedTable(Tree &tree);
     void setTableValues(Tree &tree, int tableIndex, std::string &line);
