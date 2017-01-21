@@ -22,14 +22,16 @@ na końcu można się pochwalić czymś co warto wspomnieć.
 
 + a) Działa.
 + b) Tak.
-+ c) 
-+ d) Tak.
++ c) Tak.
++ d) Tak. Tworzony jest nowy typ danych dla IMPLICIT APPLICATION.
 - e) Nie. Zapis w formie wektora.
-? f) 
-? g)
-+ h) Tak.
-+ i) Tak. Ograniczeniem jest wielkość pakietu UDP - ramka pakietu UDP.
-? j) To samo co f).
++ f) * sysDescr (odczyt) - pobiera informacje o systemie.
+     * sysName (odczyt i zapis) - pobiera i zapisuje hostname. Ze względu na to, że jest to hostname, zmiana w systemie będzie widoczna dopiero po restarcie systemu.
+     * sysUpTime (odczyt) - zaimplementowane pobieranie informacji o tym, jak długo jest uruchomiony agent.
++ g) Niektóre wartości są zapisywane w plikach, więc przetrwają reset programu.
++ h) Tak. Opisane dokładniej w punkcie "Chwalenie się".
++ i) Tak. Ograniczeniem jest wielkość pakietu UDP minus ramka pakietu UDP.
++ j) To samo co f).
 
 
 Chwalenie się
@@ -37,26 +39,70 @@ Chwalenie się
 
 Ścieżka bez hardkodowania
 --------------------
+Program potrafi poprawnie zinterpretować zapis taki jak poniższy:
 { iso org(3) dod(6) 1 }
 
 
 Community string z pliku
 --------------------
+W pliku data/community_string.conf można zapisać własne community string.
+Format:
+rocommunity/rwcommunity community_string adres_ip/maska
+- rocommunity - uprawnienia do odczytu
+- rwcommunity - uprawnienia do odczytu i zapisu
+- community_string - wybrany community string
+- adres_ip (opcjonalnie) - akceptowalny adres IP klienta SNMP
+- maska (opcjonalnie) - maska podsieci, z której będzie akceptowany adres IP klienta SNMP
+
+Przykład:
+    rocommunity cs1
+Zapytania z community stringiem cs1 będą miały uprawnienia odczytu i klient może mieć dowolny adres IP.
+    rwcommunity cs2 234.67.0.0/16
+Zapytania z community stringiem cs2 będą miały uprawnienia odczytu i zapisu i klient może mieć dowolny adres IP z podsieci 234.67.0.0/16.
+    rwcommunity cs3 1.1.1.1
+Zapytania z community stringiem cs3 będą miały uprawnienia odczytu i zapisu i klient musi mieć adres IP z podsieci 1.1.1.1.
 
 
 Drzewo BER PDU
 --------------------
+Zapytanie i odpowiedź PDU zapisywane są w firmie drzewa.
+W trybie debug to drzewo jest wyświetlane w konsoli agenta.
 
 
 Opcje przy uruchamianiu
 --------------------
+Program jest programem konsolowym i przy uruchamianiu są dostępne przełączniki przedstawione poniżej.
+Komenda: agent-snmp [OPCJA]
+
+Opcje:
+    -h, --help         wyświetla pomoc
+    -d, --debug        uruchamia program w trybie debug: wyświetla odebrane i wysyłane pakiety oraz wyświetla drzewa PDU zapytania i odpowiedzi
+    -t, --print_tree   wyświetla drzewo MIB
+    -i, --interactive  uruchamia program w trybie interaktywnym (wtedy tryb debug jest włączany automatycznie)
 
 
 Tryb interaktywny
 --------------------
+W przypadku włączenia trybu interaktywnego tworzony jest nowy wątek do obsługi interakcji w użytkownikiem.
+W trybie interaktywnym włączany jest tryb debug, czyli pakiety i drzewo PDU jest wyświetlane.
+
+Komendy:
+    h, help                             wyświetla pomoc
+    t, print_tree                       wyświetla drzewo MIB
+    n [NAME], print_node_name [NAME]    wyświetla informacje o punkcie drzewa o nazwie NAME
+    o [OID], print_node_oid [OID]       wyświetla informacje o punkcie drzewa o identyfikatorze obiektu OID
+    exit, quit                          wyłącza program
 
 
 Tabele
 --------------------
+Możliwy jest odczyt wartości z tabel.
+Możliwość zapisu wartości nie została zaimplementowana i dlatego bez względu na ACCESS próba zapisu do tabeli kończy się błędem ERROR_READONLY.
+
+W programie zapisano wartości do dwóch tabel: ifEntry i atEntry. Tabela ifEntry ma wartości zhardkodowane, a tabela atEntry odczytuje watości z pliku data/table_atEntry.data.
 
 
+Uwagi
+=========================
+Program został zbudowany na komputerze z systemem operacyjnym Arch Linux z jądrem linux 4.8.13-1. Wykorzystano kompilator gcc 6.3.1.
+Nie ma gwarancji, że program będzie działał prawidłowo na komputerach z innymi systemami operacyjnymi.

@@ -35,7 +35,6 @@ public:
 
     void saveValuesToTree(Tree &tree);
 
-
     MIBToolkit toolkitInst;
 
     struct permissionStruct {

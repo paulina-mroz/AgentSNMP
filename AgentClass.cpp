@@ -126,6 +126,7 @@ void AgentClass::printNode(std::string const& name) {
 void AgentClass::printNode(std::vector<long> const& name) {
     std::cout << "\nINFO about: ";
     parserInst.tree.printVector(name);
+    std::cout << std::endl;
     int index = parserInst.tree.findNode(name);
     if (index < 0) {
         std::cout << "Requested node does not exist :(" << std::endl;

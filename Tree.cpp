@@ -80,11 +80,6 @@ void Node::printInfo() {
             std::cout << "\n\t" << v;
         }
         std::cout << std::endl;
-        // std::cout << "\t(";
-        // for (auto &v : indexIndex) {
-        //     std::cout << ", " << v;
-        // }
-        // std::cout << ")" << std::endl;
     }
     if (!value.empty()) {
         std::cout << "VALUES\n";
@@ -176,10 +171,9 @@ void Tree::printTree() {
                 }
             }
             printVector(id);
-            // std::cout << " " << node.at(ind).name << std::endl;
-            if (!node.at(ind).value.empty()) {
-                printf(" [%d]", node.at(ind).value.size());
-            }
+            // if (!node.at(ind).value.empty()) {
+            //     printf(" [%d]", node.at(ind).value.size());
+            // }
             std::cout << " " << node.at(ind).name << std::endl;
         }
         level.at(sizeID-1)--;

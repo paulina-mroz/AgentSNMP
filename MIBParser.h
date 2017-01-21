@@ -24,7 +24,6 @@ public:
     void handleParentFromBraces(std::string &child, std::string &blockParent);
     void handleTypeImplicit(const std::string &block);
     void setIndexIndex();
-    
 
     void initPrimaryTypes();
     void addType(const std::string block, Type &type);

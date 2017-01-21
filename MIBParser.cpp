@@ -58,16 +58,6 @@ void MIBParser::initPrimaryTypes() {
     //     std::cout << "INFO " << p.first << std::endl;
     //     p.second.printInfo();
     // }
-    // std::map <int, std::string> typeBer;
-    // typeBer[0x02] = "INTEGER";
-    // typeBer[0x04] = "OCTET STRING";
-    // typeBer[0x30] = "SEQUENCE";
-    // typeBer[0x05] = "NULL";
-    // typeBer[0x06] = "OBJECT IDENTIFIER";
-    // typeBer[0xA0] = "GETREQUEST";
-    // typeBer[0xA1] = "GETNEXTREQUEST";
-    // typeBer[0xA2] = "GETRESPONSE";
-    // typeBer[0xA3] = "SETREQUEST";
 }
 
 void MIBParser::getFile(std::string fileName, std::string &content) {
@@ -127,16 +117,9 @@ void MIBParser::setIndexIndex() {
         n.indexIndex.clear();
         if (!n.index.empty()) {
             for (auto &ind : n.index) {
-                // std::cout << "INDEX " << ind << std::endl;
                 int nodeIndex = tree.findNode(ind);
                 if (nodeIndex >= 0) {
                     long childNumber = tree.node.at(nodeIndex).oid.back();
-                    // std::cout << "CHILDREN ";
-                    // for (auto &ch : n.child) {
-                    //     std::cout << ch << " ";
-                    // }
-                    // std::cout << std::endl;
-                    // std::cout << "CHILD " << childNumber << std::endl;
                     n.indexIndex.push_back(n.findChild(childNumber));
                 }
             }
@@ -156,8 +139,7 @@ void MIBParser::handleImports(const std::string &block) {
 
         for(std::sregex_iterator i = std::sregex_iterator(blockImport.begin(), blockImport.end(), rgx2); i != std::sregex_iterator(); ++i ) {
             match2 = *i;
-            // for (unsigned i=0; i<match2.size(); ++i)
-            //     std::cout << "match #" << i << ": " << match2[i] << std::endl;
+
             std::string name = match2.str(1);
             if (name != "RFC-1212") {
                 std::string fileName = "mibs/" + name + ".txt";
@@ -166,6 +148,7 @@ void MIBParser::handleImports(const std::string &block) {
                 handleObjectID(contentImport);
                 handleTypeImplicit(contentImport);
             }
+
             // for (auto &p : typeMap) {
             //     std::cout << "INFO " << p.first << std::endl;
             //     p.second.printInfo();
@@ -180,8 +163,7 @@ void MIBParser::handleObjectID(const std::string &block) {
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "match #" << i << ": " << match[i] << std::endl;
+
         std::string blockNodes = match.str(2);
         std::string name = match.str(1);
         handleParentFromBraces(name,blockNodes);
@@ -200,8 +182,6 @@ void MIBParser::handleObjectType(const std::string &block) {
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "********** match #" << i << "[" << match.str(i).empty() << "]: " << match[i] << std::endl;
 
         std::string blockNodes = match.str(8);
         std::string name = match.str(1);
@@ -230,7 +210,7 @@ void MIBParser::handleObjectType(const std::string &block) {
         addType(tree.node.at(tree.findNode(name)).syntax, tree.node.at(tree.findNode(name)).type);
         tree.node.at(tree.findNode(name)).type.ber = typeMap[tree.node.at(tree.findNode(name)).type.primaryType].ber;
         tree.node.at(tree.findNode(name)).type.storage = typeMap[tree.node.at(tree.findNode(name)).type.primaryType].storage;
-        // std::cout << "INFO " << name << std::endl;
+        // std::` << "INFO " << name << std::endl;
         // tree.node.at(tree.findNode(name)).type.printInfo();
     }
 
@@ -254,8 +234,6 @@ void MIBParser::handleParentFromBraces(std::string &child, std::string &blockPar
             std::smatch matchIt;
 
             if (std::regex_search(blockIt.begin(), blockIt.end(), matchIt, rgxIt)) {
-                //  for (unsigned i=0; i<matchIt.size(); ++i)
-                //      std::cout << "match2 #" << i << ": " << matchIt[i] << std::endl;
 
                 nameChild = matchIt.str(1);
                 if (matchIt.str(2).empty()) {
@@ -281,8 +259,7 @@ void MIBParser::handleTypeImplicit(const std::string &block) {
 
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgx); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "IMPLICIT match #" << i << ": " << match[i] << std::endl;
+
         std::string name = match.str(1);
         int implicitNumber = std::stoi(match.str(2));
         const std::string blockType = match.str(3);
@@ -317,8 +294,7 @@ void MIBParser::addType(const std::string block, Type &type) {
     std::smatch match;
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgxPrim); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "Prim match #" << i << ": ---" << match[i] << "---" << std::endl;
+
         std::string primary = match.str(1);
         boost::trim(primary);
         type.primaryType = primary;
@@ -327,8 +303,7 @@ void MIBParser::addType(const std::string block, Type &type) {
     std::regex rgxRange(rgxStrRange);
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgxRange); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "Range match #" << i << ": ---" << match[i] << "---" << std::endl;
+
         std::string primary = match.str(1);
         boost::trim(primary);
         type.primaryType = primary;
@@ -339,8 +314,7 @@ void MIBParser::addType(const std::string block, Type &type) {
     std::regex rgxSize(rgxStrSize);
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgxSize); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "Size match #" << i << ": ---" << match[i] << "---" << std::endl;
+
         std::string primary = match.str(1);
         boost::trim(primary);
         type.primaryType = primary;
@@ -355,8 +329,7 @@ void MIBParser::addType(const std::string block, Type &type) {
     std::regex rgxEnum(rgxStrEnum);
     for(std::sregex_iterator i = std::sregex_iterator(block.begin(), block.end(), rgxEnum); i != std::sregex_iterator(); ++i ) {
         match = *i;
-        // for (unsigned i=0; i<match.size(); ++i)
-        //     std::cout << "Enum match #" << i << ": ---" << match[i] << "---" << std::endl;
+
         std::string primary = match.str(1);
         boost::trim(primary);
         type.primaryType = primary;
@@ -371,8 +344,7 @@ void MIBParser::addType(const std::string block, Type &type) {
             std::smatch matchIt;
 
             if (std::regex_search(blockIt.begin(), blockIt.end(), matchIt, rgxIt)) {
-                //  for (unsigned i=0; i<matchIt.size(); ++i)
-                //      std::cout << "Item match2 #" << i << ": " << matchIt[i] << std::endl;
+
                 Type::enumInt ei;
                 type.enumInts.push_back(ei);
                 type.enumInts.back().s = matchIt.str(1);

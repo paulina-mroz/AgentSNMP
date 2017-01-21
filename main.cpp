@@ -33,7 +33,13 @@ void *interactivePrint(void*) {
 int main(int argc, char **argv) {
     if (argc == 2) {
         if ((!strcmp(argv[1], "--help")) || (!strcmp(argv[1], "-h"))) {
-            printf("Agent SNMP\n\thelp\n");
+            printf("Agent SNMP\nNote: You may need sudo privileges to run program.\n");
+            printf("Usage: agent-snmp [OPTION]\n\n");
+            printf("Options:\n");
+            printf("\t-h, --help\t\tdisplay this help message\n");
+            printf("\t-d, --debug\t\trun program in debug mode: dump input/output packets in hexadecimal and display PDU structure\n");
+            printf("\t-t, --print_tree\tdisplay MIB tree\n");
+            printf("\t-i, --interactive\trun program in interactive mode (also turns on the debug mode)\n");
             return 0;
         }
     }
@@ -55,7 +61,7 @@ int main(int argc, char **argv) {
             agentInst.debugPrint = true;
             int rc = pthread_create(&interactiveThread, NULL, interactivePrint, NULL);
             if (rc) {
-                printf("Error: unable to enter interactive mode :(\n");
+                printf("Error: unable to enter interactive mode.\n");
                 exit(-1);
             }
         }
@@ -66,7 +72,7 @@ int main(int argc, char **argv) {
     }
 
     if (!commandCorrect) {
-        printf("Error: command unknown. Type '--help' or '-h' for help\n");
+        printf("Error: command unknown. Type '--help' or '-h' for help.\n");
         return 0;
     }
 
@@ -76,8 +82,14 @@ int main(int argc, char **argv) {
 
 void printMenu(std::vector<std::string> commands) {
     if (commands.size() == 1) {
-        if ((commands.at(0) == "help") || (commands.at(0) == "h")) {
-            printf("Agent SNMP\n\thelp\n");
+        if ((commands.at(0) == "help") || (commands.at(0) == "h") || (commands.at(0) == "?")) {
+            printf("Agent SNMP\n*** interactive mode ***\n\n");
+            printf("Commands:\n");
+            printf("\th, help\t\t\t\t\tdisplay this help message\n");
+            printf("\tt, print_tree\t\t\t\tdisplay MIB tree\n");
+            printf("\tn [NAME], print_node_name [NAME]\tdisplay information about node with the name NAME\n");
+            printf("\to [OID], print_node_oid [OID]\t\tdisplay information about node with the object identifier OID\n");
+            printf("\texit, quit\t\t\t\texit the program\n");
         }
         if ((commands.at(0) == "print_tree") || (commands.at(0) == "t")) {
             agentInst.parserInst.tree.printTree();

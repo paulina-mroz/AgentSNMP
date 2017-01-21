@@ -6,6 +6,5 @@
 #include "Type.h"
 
 extern std::map<std::string, Type> typeMap;
-// extern std::map <int, std::string> typeBer;
 
 #endif /* EXTERNS_H */

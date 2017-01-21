@@ -1,15 +1,6 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-// #define SHOW_DEBUG 0
-// #if SHOW_DEBUG
-// #define DEBUG(...) printf("%s(%d):\t%s: ", __FILE__, __LINE__, __FUNCTION__); printf(__VA_ARGS__); printf("\n");
-// #define DEBUG1     printf
-// #else
-// #define DEBUG(...)
-// #define DEBUG1
-// #endif
-
 #define PORT            161
 #define RECVBUF_SIZE    65507
 #define SENDBUF_SIZE    65507
@@ -20,6 +11,7 @@
 #define ERROR_BADVALUE      3
 #define ERROR_READONLY      4
 #define ERROR_GENERR        5
+
 // noError(0)
 // There was no problem performing the request.
 //

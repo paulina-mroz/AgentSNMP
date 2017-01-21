@@ -34,7 +34,6 @@ bool SNMPDeserializer::checkRequest() {
         return false;
     }
 
-    // printf("Request correct :)\n");
     return true;
 }
 
@@ -142,7 +141,6 @@ long SNMPDeserializer::getIntValue(std::list<char> &berInt) {
             result = 256*result + (unsigned char)p;
         }
     }
-    // printf("getInt %d\n", result);
     return result;
 }
 
