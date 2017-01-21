@@ -66,10 +66,13 @@ int main(int argc, char **argv) {
             std::vector<std::string> v;
             std::vector<long> v_int;
             boost::split_regex(v, name, boost::regex( "\\." ));
-            for (auto &p : v) {
-                v_int.push_back(std::stoi(p));
+            try {
+                for (auto &p : v) {
+                    v_int.push_back(std::stoi(p));
+                }
+                agentInst.parserInst.tree.printNode(v_int);
+            } catch (...) {
             }
-            agentInst.parserInst.tree.printNode(v_int);
         }
     }
 
@@ -98,10 +101,17 @@ void printMenu(std::vector<std::string> commands) {
             std::vector<std::string> v;
             std::vector<long> v_int;
             boost::split_regex(v, name, boost::regex( "\\." ));
-            for (auto &p : v) {
-                v_int.push_back(std::stoi(p));
+            try {
+                for (auto &p : v) {
+                    v_int.push_back(std::stoi(p));
+                }
+                agentInst.parserInst.tree.printNode(v_int);
+            } catch (...) {
             }
-            agentInst.parserInst.tree.printNode(v_int);
+            // for (auto &p : v) {
+            //     v_int.push_back(std::stoi(p));
+            // }
+            // agentInst.parserInst.tree.printNode(v_int);
         }
     }
 }
